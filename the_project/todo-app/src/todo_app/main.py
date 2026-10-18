@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-PORT = int(os.getenv("PORT", "8000"))
+PORT = int(os.getenv("UVICORN_PORT", "8000"))
 
 
 @asynccontextmanager
