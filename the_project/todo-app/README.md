@@ -50,3 +50,9 @@ docker exec k3d-k3s-default-server-0 crictl rmi hupratt/todo-app:1.2
 docker exec k3d-k3s-default-agent-0 crictl rmi hupratt/todo-app:1.2
 docker exec k3d-k3s-default-agent-1 crictl rmi hupratt/todo-app:1.2
 ```
+
+publish the release:
+
+```bash
+gh release create 1.2 --target=main --notes "1.2. The project is complete"
+```

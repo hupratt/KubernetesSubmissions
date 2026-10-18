@@ -39,3 +39,9 @@ git push origin 1.1
 # list
 git tag -n
 ```
+
+publish the release:
+
+```bash
+gh release create 1.3 --target=main --notes "1.3. Declarative approach is complete"
+```
