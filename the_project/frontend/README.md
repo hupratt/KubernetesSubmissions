@@ -28,3 +28,16 @@ and run it
 ```bash
 cd ../todo-app && uv run fastapi dev src/todo_app/main.py
 ```
+
+build the image again to include the static files, push it to dockerhub and make sure the deployment always pulls even if the tag is unchanged
+
+```bash
+docker build --no-cache -t hupratt/todo-app:1.2 .
+docker push hupratt/todo-app --all-tags 
+```
+
+publish the release:
+
+```bash
+gh release create 1.5 --target=main --notes "1.5. The project is complete"
+```
