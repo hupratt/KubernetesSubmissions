@@ -2,6 +2,7 @@ import logging
 import os
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from fastapi.staticfiles import StaticFiles
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,9 +17,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-@app.get("/")
-def homepage():
-    return {"message": "Hello, world!"}
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 @app.get("/health")
 def health():
