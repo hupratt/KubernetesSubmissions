@@ -25,3 +25,15 @@ run the image in k3d
 ```bash
 kubectl create deployment logoutput --image=hupratt/log_output:1.1
 ```
+
+tag is assigned to the wrong commit because it got created automatically with our earlier gh command
+
+```bash
+git fetch --tags
+# delete locally and on github
+git tag -d 1.1
+git push origin --delete 1.1
+# tag the right commit and push it to the remote
+git tag 1.1 e11a935311ac4206cefbfa5539751aaeb2eba393
+git push origin 1.1
+```
