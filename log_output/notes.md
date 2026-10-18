@@ -12,3 +12,16 @@ build the app
 docker build -t hupratt/log_output:1.1 .
 docker push hupratt/log_output --all-tags 
 ```
+
+if that fails with "requested access to the resource is denied", make sure to login again
+
+```bash
+docker logout
+docker login -u hupratt
+```
+
+run the image in k3d
+
+```bash
+kubectl create deployment logoutput --image=hupratt/log_output:1.1
+```
