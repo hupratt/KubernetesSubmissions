@@ -34,6 +34,8 @@ git fetch --tags
 git tag -d 1.1
 git push origin --delete 1.1
 # tag the right commit and push it to the remote
-git tag 1.1 e11a935311ac4206cefbfa5539751aaeb2eba393
+git tag 1.1 c8e99bacdf17dfb094c202d10f25903da7083950
 git push origin 1.1
+# list
+git tag -n
 ```
