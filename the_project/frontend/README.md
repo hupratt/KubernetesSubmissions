@@ -45,5 +45,6 @@ gh release create 1.7 --target=main --notes "1.7. The project is complete"
 gh release create 1.8 --target=main --notes "1.8. The project is complete"
 gh release create 1.9 --target=main --notes "1.9. The project is complete"
 gh release create 1.10 --target=main --notes "1.10. The project is complete"
+gh release create 1.11 --target=main --notes "1.11. The project is complete"
 
 ```
