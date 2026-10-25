@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: logoutput
-          image: hupratt/log_output:1.7
+          image: hupratt/log_output:1.9
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
