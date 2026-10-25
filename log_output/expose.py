@@ -1,22 +1,39 @@
 import os
 import threading
-import time
-import uuid
-from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 LOG_FILE = os.environ.get("LOG_FILE", "/var/log/info.log")
+PING_FILE = os.environ.get("PING_FILE", "/var/log/pingpong.log")
 
-counter = 0
 lock = threading.Lock()
 
 
-def read_file(path):
+def read_latest(path):
     try:
         with open(path, "r", encoding="utf-8") as f:
-            return f.read()
+            return f.read().strip()
     except FileNotFoundError:
         return ""
+
+
+def load_counter(path):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return int(f.read().strip())
+    except (FileNotFoundError, ValueError):
+        return 0
+
+
+def save_counter(path, value):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(f"{value}\n")
+    os.replace(tmp, path)
+
+
+counter = load_counter(PING_FILE)
+
 
 class Handler(BaseHTTPRequestHandler):
     def respond(self, text):
@@ -31,18 +48,17 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         global counter
         if self.path == "/":
-            with lock:
-                text = read_file(LOG_FILE) or "no entries yet"
-            self.respond(text)
+            self.respond(read_latest(LOG_FILE) or "no entries yet")
         elif self.path == "/pingpong":
             with lock:
                 text = f"pong {counter}"
                 counter += 1
+                save_counter(PING_FILE, counter)
             self.respond(text)
         else:
             self.send_error(404)
 
-    def log_message(self, *args):  # silence per-request access logs
+    def log_message(self, *args):
         pass
 
 
