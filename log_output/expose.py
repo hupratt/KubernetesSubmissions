@@ -7,22 +7,16 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 LOG_FILE = os.environ.get("LOG_FILE", "/var/log/info.log")
 
-latest = "no entries yet"
 counter = 0
 lock = threading.Lock()
 
 
-def producer():
-    global latest
-    os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-    while True:
-        line = f"{datetime.now().isoformat(timespec='seconds')} {uuid.uuid4()}"
-        with lock:
-            latest = line
-        with open(LOG_FILE, "a", encoding="utf-8") as f:
-            f.write(line + "\n")
-        time.sleep(5)
-
+def read_file(path):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        return ""
 
 class Handler(BaseHTTPRequestHandler):
     def respond(self, text):
@@ -38,7 +32,7 @@ class Handler(BaseHTTPRequestHandler):
         global counter
         if self.path == "/":
             with lock:
-                text = latest
+                text = read_file(LOG_FILE) or "no entries yet"
             self.respond(text)
         elif self.path == "/pingpong":
             with lock:
@@ -53,5 +47,4 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    threading.Thread(target=producer, daemon=True).start()
     ThreadingHTTPServer(("0.0.0.0", 8000), Handler).serve_forever()
