@@ -9,6 +9,7 @@ COPY main.py .
  
 RUN useradd --no-create-home --shell /usr/sbin/nologin appuser
 USER appuser
- 
+EXPOSE 8000
+
 CMD ["python", "main.py"]
  
