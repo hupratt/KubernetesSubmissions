@@ -1,21 +1,26 @@
+import asyncio
 import logging
 import os
-import asyncio
 import time
 from contextlib import asynccontextmanager
-from fastapi.staticfiles import StaticFiles
+from pathlib import Path
+
 import httpx
 from fastapi import FastAPI, HTTPException, Response
+from fastapi.staticfiles import StaticFiles
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 PORT = int(os.getenv("UVICORN_PORT", "8000"))
 PICSUM_URL = "https://picsum.photos/1200"
-TTL_SECONDS = 600  # 10 minutes
+TTL_SECONDS = 6  # 10 minutes
+STATIC_DIR = Path(__file__).parent / "static"
 
 # Single cached image: bytes, content type, and monotonic expiry time.
 _cache: dict = {"body": None, "content_type": "image/jpeg", "expires_at": 0.0}
 _lock = asyncio.Lock()  # prevents several requests refetching at once
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,7 +30,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 @app.get("/health")
 def health():
@@ -58,6 +62,12 @@ async def get_image() -> Response:
     return Response(
         content=body,
         media_type=content_type,
-        # Lets the browser keep the same image until the server-side cache expires.
         headers={"Cache-Control": f"public, max-age={remaining}"},
     )
+
+
+# Must stay LAST: a mount at "/" matches every path registered after it.
+if STATIC_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+else:
+    logger.warning("No static dir at %s; frontend not served", STATIC_DIR)
