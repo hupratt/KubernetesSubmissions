@@ -40,4 +40,5 @@ publish the release:
 
 ```bash
 gh release create 1.5 --target=main --notes "1.5. The project is complete"
+gh release create 1.6 --target=main --notes "1.6. The project is complete"
 ```
