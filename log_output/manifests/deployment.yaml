@@ -17,7 +17,7 @@ spec:
           emptyDir: {}
       containers:
         - name: logoutput-expose
-          image: hupratt/log_output:1.10
+          image: hupratt/log_output:1.11
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
@@ -25,7 +25,7 @@ spec:
           - name: shared-logs
             mountPath: /var/log
         - name: logoutput-producer
-          image: hupratt/log_output:1.10
+          image: hupratt/log_output:1.11
           imagePullPolicy: Always
           command: ["python", "produce.py"]
           volumeMounts:
