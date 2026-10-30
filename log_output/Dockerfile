@@ -7,7 +7,8 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY . .
  
-RUN useradd --no-create-home --shell /usr/sbin/nologin appuser
+RUN useradd --no-create-home --shell /usr/sbin/nologin appuser \
+ && chown appuser /app
 USER appuser
 EXPOSE 8000
 
