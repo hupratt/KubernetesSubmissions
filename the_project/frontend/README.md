@@ -48,3 +48,9 @@ gh release create 1.10 --target=main --notes "1.10. The project is complete"
 gh release create 1.11 --target=main --notes "1.11. The project is complete"
 
 ```
+
+
+```bash
+docker build --no-cache -t hupratt/todo-app:2.2 .
+docker push hupratt/todo-app:2.2
+```

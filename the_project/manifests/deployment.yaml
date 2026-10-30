@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: todo
-          image: hupratt/todo-app:1.2
+          image: hupratt/todo-app:2.2
           imagePullPolicy: Always
           env:
             - name: UVICORN_PORT

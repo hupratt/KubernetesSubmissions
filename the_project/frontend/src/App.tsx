@@ -1,26 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 
 const MAX_LENGTH = 140;
 
-const INITIAL_TODOS = [
-  "Learn how Kubernetes Deployments work",
-  "Write a Dockerfile for the todo app",
-  "Set up the cluster ingress",
-];
+type Todo = { id: number; text: string };
 
 export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const [todo, setTodo] = useState("");
-  const [todos] = useState(INITIAL_TODOS);
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e) => {
-    // Guard against pasted text exceeding the limit
+  useEffect(() => {
+    fetch("/todos")
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(setTodos)
+      .catch(() => setError("Could not load todos."));
+  }, []);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTodo(e.target.value.slice(0, MAX_LENGTH));
   };
 
-  const handleSend = () => {
-    // Does not send anything yet
+  const handleSend = async () => {
+    const text = todo.trim();
+    if (!text) return;
+    try {
+      const r = await fetch("/todos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const created = await r.json();
+      setTodos((prev) => [...prev, created]);
+      setTodo("");
+      setError(null);
+    } catch {
+      setError("Could not create todo.");
+    }
   };
 
   return (
@@ -40,7 +61,12 @@ export default function App() {
         }}
       />
 
-      <div>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSend();
+        }}
+      >
         <input
           type="text"
           value={todo}
@@ -49,17 +75,17 @@ export default function App() {
           placeholder="What needs to be done?"
           aria-label="New todo"
         />
-        <button type="button" onClick={handleSend}>
-          Send
-        </button>
+        <button type="submit">Send</button>
         <p>
           {todo.length}/{MAX_LENGTH}
         </p>
-      </div>
+      </form>
+
+      {error && <p role="alert">{error}</p>}
 
       <ul>
-        {todos.map((t, i) => (
-          <li key={i}>{t}</li>
+        {todos.map((t) => (
+          <li key={t.id}>{t.text}</li>
         ))}
       </ul>
 

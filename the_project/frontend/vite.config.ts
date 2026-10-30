@@ -8,6 +8,6 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    proxy: { "/api": "http://localhost:8000" },
+    proxy: { "/todos": "http://localhost:8000", "/api": "http://localhost:8000" },
   },
 });
