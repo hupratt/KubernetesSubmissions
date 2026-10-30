@@ -62,3 +62,16 @@ publish the release:
 ```bash
 gh release create 1.4 --target=main --notes "1.4. The project is complete"
 ```
+
+To run the frontend and the backend:
+
+```bash
+cd the_project/todo-app && uv run fastapi dev src/todo_app/main.py
+cd the_project/frontend && npm run dev
+# and visit http://localhost:5173/
+```
+publish the release:
+
+```bash
+gh release create 1.12 --target=main --notes "1.12. The project is complete"
+```
