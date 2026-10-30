@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import json
 import logging
 import os
 import time
@@ -18,7 +19,13 @@ PICSUM_URL = "https://picsum.photos/1200"
 TTL_SECONDS = 600  # 10 minutes
 STATIC_DIR = Path(__file__).parent / "static"
 
-# Single cached image: bytes, content type, ETag, and monotonic expiry time.
+# Where the cached image lives on disk. Point this at a mounted volume in Docker/K8s.
+CACHE_DIR = Path(os.getenv("CACHE_DIR", Path(__file__).parent / "cache"))
+IMAGE_FILE = CACHE_DIR / "image.bin"
+META_FILE = CACHE_DIR / "meta.json"
+
+# In-memory copy of the cached image. expires_at is wall-clock time (time.time())
+# because time.monotonic() is meaningless after a restart.
 _cache: dict = {
     "body": None,
     "content_type": "image/jpeg",
@@ -28,8 +35,41 @@ _cache: dict = {
 _lock = asyncio.Lock()  # prevents several requests refetching at once
 
 
+def _atomic_write(path: Path, data: bytes) -> None:
+    """Write to a temp file, then rename, so readers never see a half-written file."""
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_bytes(data)
+    os.replace(tmp, path)
+
+
+def _save_to_disk() -> None:
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    _atomic_write(IMAGE_FILE, _cache["body"])
+    meta = {
+        "content_type": _cache["content_type"],
+        "expires_at": _cache["expires_at"],
+    }
+    _atomic_write(META_FILE, json.dumps(meta).encode())
+
+
+def _load_from_disk() -> None:
+    try:
+        body = IMAGE_FILE.read_bytes()
+        meta = json.loads(META_FILE.read_text())
+        _cache["body"] = body
+        _cache["content_type"] = meta["content_type"]
+        _cache["expires_at"] = float(meta["expires_at"])
+        _cache["etag"] = f'"{hashlib.sha1(body).hexdigest()}"'
+        logger.info("Loaded cached image from %s", IMAGE_FILE)
+    except FileNotFoundError:
+        logger.info("No cached image on disk yet")
+    except (OSError, ValueError, KeyError) as exc:
+        logger.warning("Ignoring unreadable cache on disk: %s", exc)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _load_from_disk()
     logger.info("Server started on port %s", PORT)
     yield
 
@@ -49,13 +89,18 @@ async def _refresh() -> None:
     _cache["body"] = r.content
     _cache["content_type"] = r.headers.get("content-type", "image/jpeg")
     _cache["etag"] = f'"{hashlib.sha1(r.content).hexdigest()}"'
-    _cache["expires_at"] = time.monotonic() + TTL_SECONDS
+    _cache["expires_at"] = time.time() + TTL_SECONDS
+    try:
+        await asyncio.to_thread(_save_to_disk)  # keep file IO off the event loop
+    except OSError as exc:
+        # Disk problems shouldn't break serving; the in-memory copy still works.
+        logger.warning("Could not write cache to disk: %s", exc)
 
 
 @app.get("/api/image")
 async def get_image(request: Request) -> Response:
     async with _lock:
-        if _cache["body"] is None or time.monotonic() >= _cache["expires_at"]:
+        if _cache["body"] is None or time.time() >= _cache["expires_at"]:
             try:
                 await _refresh()
             except httpx.HTTPError:
