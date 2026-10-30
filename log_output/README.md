@@ -45,3 +45,10 @@ publish the release:
 ```bash
 gh release create 1.3 --target=main --notes "1.3. Declarative approach is complete"
 ```
+
+build the app
+
+```bash
+docker build -t hupratt/log_output:2.1 .
+docker push hupratt/log_output:2.1
+```
