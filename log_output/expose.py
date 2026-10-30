@@ -1,9 +1,11 @@
 import os
 import threading
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-LOG_FILE = os.environ.get("LOG_FILE", "/var/log/info.log")
-PING_FILE = os.environ.get("PING_FILE", "/var/log/pingpong.log")
+LOG_FILE = os.environ.get("LOG_FILE", "./info.log")
+PING_FILE = os.environ.get("PING_FILE", "./pingpong.log")
+PINGPONG_URL = os.environ.get("PINGPONG_URL", "http://localhost:8000/pings")
 
 lock = threading.Lock()
 
@@ -14,6 +16,14 @@ def read_latest(path):
             return f.read().strip()
     except FileNotFoundError:
         return ""
+
+
+def fetch_pongs():
+    try:
+        with urllib.request.urlopen(PINGPONG_URL, timeout=2) as r:
+            return r.read().decode().strip()
+    except Exception:
+        return "unavailable"
 
 
 def load_counter(path):
@@ -48,7 +58,12 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         global counter
         if self.path == "/":
-            self.respond(read_latest(LOG_FILE) or "no entries yet")
+            line = read_latest(LOG_FILE) or "no entries yet"
+            self.respond(f"{line}\npongs: {fetch_pongs()}")
+        elif self.path == "/pings":
+            with lock:
+                value = counter
+            self.respond(str(value))
         elif self.path == "/pingpong":
             with lock:
                 text = f"pong {counter}"
