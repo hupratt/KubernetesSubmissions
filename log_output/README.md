@@ -57,3 +57,14 @@ docker push hupratt/log_output:2.1
 gh release create 2.3 --target=main --notes "2.3. The project is complete"
 gh release create 2.4 --target=main --notes "2.4. The project is complete"
 ```
+
+
+
+build the app
+
+```bash
+docker build -t hupratt/log_output:2.5 .
+docker push hupratt/log_output:2.5
+gh release create 2.5 --target=main --notes "2.5. The project is complete"
+
+```

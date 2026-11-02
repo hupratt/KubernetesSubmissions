@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: log-output-config
+  namespace: exercises
+  labels:
+    app: log-output
+data:
+  information.txt: |
+    This is some information.
+    The number of videos accessible through the API.
+    By default, the API is limited to return a maximum of 500 videos per query.
+  MESSAGE: "Keep going champ"

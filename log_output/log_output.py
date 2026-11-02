@@ -7,6 +7,9 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 LOG_FILE = os.environ.get("LOG_FILE", "./info.log")
+MESSAGE = os.environ.get("MESSAGE", "empty message")
+INFO_FILE = "/config/information.txt"
+
 PINGPONG_URL = os.environ.get("PINGPONG_URL", "http://localhost:8001/pings")
 PORT = int(os.environ.get("PORT", "8000"))
 
@@ -14,12 +17,21 @@ PORT = int(os.environ.get("PORT", "8000"))
 def produce():
     os.makedirs(os.path.dirname(LOG_FILE) or ".", exist_ok=True)
     tmp = LOG_FILE + ".tmp"
+    env_message = f"env variable: MESSAGE={MESSAGE}"
     while True:
         line = f"{datetime.now().isoformat(timespec='seconds')} {uuid.uuid4()}"
+        # Read ConfigMap file
+        with open(INFO_FILE, "r", encoding="utf-8") as f:
+            file_content = f.read().strip()
+        file_message = f"file content: {file_content}"
         with open(tmp, "w", encoding="utf-8") as f:
             f.write(line + "\n")
+            f.write(file_message + "\n")
+            f.write(env_message + "\n")
         os.replace(tmp, LOG_FILE)  # atomic swap, readers never see a partial line
         print(line, flush=True)    # history stays available via kubectl logs
+        print(file_message, flush=True)
+        print(env_message, flush=True)
         time.sleep(5)
 
 
