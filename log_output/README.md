@@ -55,4 +55,5 @@ docker push hupratt/log_output:2.1
 
 ```bash
 gh release create 2.3 --target=main --notes "2.3. The project is complete"
+gh release create 2.4 --target=main --notes "2.4. The project is complete"
 ```
