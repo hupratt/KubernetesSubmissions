@@ -8,39 +8,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 LOG_FILE = os.environ.get("LOG_FILE", "./info.log")
 MESSAGE = os.environ.get("MESSAGE", "empty message")
-INFO_FILE = "/config/information.txt"
-
+INFO_FILE = os.environ.get("INFO_FILE", "information.txt")
 PINGPONG_URL = os.environ.get("PINGPONG_URL", "http://localhost:8001/pings")
 PORT = int(os.environ.get("PORT", "8000"))
-
-
-def produce():
-    os.makedirs(os.path.dirname(LOG_FILE) or ".", exist_ok=True)
-    tmp = LOG_FILE + ".tmp"
-    env_message = f"env variable: MESSAGE={MESSAGE}"
-    while True:
-        line = f"{datetime.now().isoformat(timespec='seconds')} {uuid.uuid4()}"
-        # Read ConfigMap file
-        with open(INFO_FILE, "r", encoding="utf-8") as f:
-            file_content = f.read().strip()
-        file_message = f"file content: {file_content}"
-        with open(tmp, "w", encoding="utf-8") as f:
-            f.write(line + "\n")
-            f.write(file_message + "\n")
-            f.write(env_message + "\n")
-        os.replace(tmp, LOG_FILE)  # atomic swap, readers never see a partial line
-        print(line, flush=True)    # history stays available via kubectl logs
-        print(file_message, flush=True)
-        print(env_message, flush=True)
-        time.sleep(5)
-
-
-def read_latest(path):
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        return ""
 
 
 def fetch_pongs():
@@ -51,13 +21,40 @@ def fetch_pongs():
         return "unavailable"
 
 
+def read_file(path, default=""):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return default
+
+
+def produce():
+    os.makedirs(os.path.dirname(LOG_FILE) or ".", exist_ok=True)
+    tmp = LOG_FILE + ".tmp"
+    env_message = f"env variable: MESSAGE={MESSAGE}"
+    while True:
+        line = f"{datetime.now().isoformat(timespec='seconds')} {uuid.uuid4()}"
+        file_message = f"file content: {read_file(INFO_FILE, 'missing')}"
+        pong_message = f"Ping / Pongs: {fetch_pongs()}"
+
+        with open(tmp, "w", encoding="utf-8") as f:
+            f.write(f"{line}\n{file_message}\n{env_message}\n{pong_message}\n")
+        os.replace(tmp, LOG_FILE)  # atomic swap, readers never see a partial write
+
+        print(line, flush=True)
+        print(file_message, flush=True)
+        print(env_message, flush=True)
+        print(pong_message, flush=True)
+        time.sleep(5)
+
+
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path.split("?")[0].rstrip("/") != "":
             self.send_error(404)
             return
-        line = read_latest(LOG_FILE) or "no entries yet"
-        body = f"{line}\npongs: {fetch_pongs()}".encode()
+        body = (read_file(LOG_FILE) or "no entries yet").encode()
         self.send_response(200)
         self.send_header("Content-Type", "text/plain; charset=utf-8")
         self.send_header("Cache-Control", "no-store")

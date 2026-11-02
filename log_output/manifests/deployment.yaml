@@ -20,6 +20,8 @@ spec:
           ports:
             - containerPort: 8000
           env:
+            - name: INFO_FILE
+              value: "/config/information.txt"
             - name: MESSAGE
               valueFrom:
                 configMapKeyRef:
