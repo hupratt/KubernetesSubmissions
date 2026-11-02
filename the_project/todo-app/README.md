@@ -75,3 +75,11 @@ publish the release:
 ```bash
 gh release create 1.12 --target=main --notes "1.12. The project is complete"
 ```
+
+publish the release:
+
+```bash
+docker build -t hupratt/todo-app:2.6 .
+docker push hupratt/todo-app:2.6
+gh release create 2.6 --target=main --notes "2.6. The project is complete"
+```

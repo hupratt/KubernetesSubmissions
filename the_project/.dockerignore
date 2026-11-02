@@ -1,1 +1,3 @@
 **/.venv
+todo-app/src/todo_app/cache
+**/__pycache__

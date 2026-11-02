@@ -15,10 +15,15 @@ spec:
     spec:
       containers:
         - name: todo
-          image: hupratt/todo-app:2.2
+          image: hupratt/todo-app:2.6
           imagePullPolicy: Always
           env:
             - name: UVICORN_PORT
-              value: "9000"
+              value: "9001"
+            - name: PICSUM_URL
+              value: "https://picsum.photos/600"
+            - name: TTL_SECONDS
+              value: "5"          
           ports:
-            - containerPort: 9000
+            - name: http
+              containerPort: 9001

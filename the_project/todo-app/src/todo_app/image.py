@@ -12,8 +12,8 @@ from fastapi import APIRouter, HTTPException, Request, Response
 
 logger = logging.getLogger(__name__)
 
-PICSUM_URL = "https://picsum.photos/1200"
-TTL_SECONDS = 600  # 10 minutes
+PICSUM_URL = os.environ.get("PICSUM_URL", "https://picsum.photos/1200")
+TTL_SECONDS = int(os.getenv("TTL_SECONDS", "600"))
 
 # Where the cached image lives on disk. Point this at a mounted volume in Docker/K8s.
 CACHE_DIR = Path(os.getenv("CACHE_DIR", Path(__file__).parent / "cache"))
