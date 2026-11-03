@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wikipedia-todo
+  namespace: exercises
+data:
+  generate.py: |
+    import os
+    import urllib.request
+    import urllib.error
+    import json
+    from urllib.parse import urljoin
+
+    WIKIPEDIA_URL = "https://en.wikipedia.org/wiki/Special:Random"
+    TODO_API_URL = os.environ["TODO_API_URL"]
+
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            return None
+
+    opener = urllib.request.build_opener(NoRedirect)
+
+    request = urllib.request.Request(
+        WIKIPEDIA_URL,
+        headers={"User-Agent": "WikipediaTodoBot/1.0"}
+    )
+
+    try:
+        opener.open(request)
+    except urllib.error.HTTPError as response:
+        article_url = response.headers.get("Location")
+    else:
+        raise Exception("Wikipedia did not return a redirect")
+
+    if not article_url:
+        raise Exception("No Location header returned by Wikipedia")
+
+    article_url = urljoin("https:", article_url)
+
+    todo = {
+        "text": f"Read {article_url}"
+    }
+
+    request = urllib.request.Request(
+        TODO_API_URL.rstrip("/") + "/todos",
+        data=json.dumps(todo).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST"
+    )
+
+    with urllib.request.urlopen(request, timeout=15) as response:
+        print(f"Created todo: {response.read().decode()}")

@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: wikipedia-todo
+  namespace: exercises
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: wikipedia-todo
+              image: python:3.12-alpine
+              imagePullPolicy: IfNotPresent
+
+              command:
+                - python
+                - /app/generate.py
+
+              env:
+                - name: TODO_API_URL
+                  value: "http://todo-svc.project.svc.cluster.local:2345"
+
+              volumeMounts:
+                - name: script
+                  mountPath: /app
+                  readOnly: true
+
+          volumes:
+            - name: script
+              configMap:
+                name: wikipedia-todo
