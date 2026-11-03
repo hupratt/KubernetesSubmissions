@@ -7,7 +7,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from . import image, todos
+from . import db, image, todos
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,11 +18,13 @@ STATIC_DIR = Path(__file__).parent / "static"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    db.pool.open(wait=True, timeout=30)
+    db.init_schema()
     image.load_from_disk()
     logger.info("Server started on port %s", PORT)
     yield
-
-
+    db.pool.close()
+    
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(image.router)

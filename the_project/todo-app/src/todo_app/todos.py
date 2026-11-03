@@ -1,9 +1,9 @@
-# /todos
 import logging
-from itertools import count
 
 from fastapi import APIRouter
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+from . import db
 
 logger = logging.getLogger(__name__)
 
@@ -11,27 +11,26 @@ MAX_LENGTH = 140
 
 router = APIRouter(prefix="/todos", tags=["todos"])
 
-# In-memory for now; replaced by a database in a later exercise.
-_todos: list[dict] = [
-    {"id": 1, "text": "Learn how Kubernetes Deployments work"},
-    {"id": 2, "text": "Write a Dockerfile for the todo app"},
-]
-_ids = count(start=3)
-
 
 class TodoIn(BaseModel):
-    # Enforce the limit on the server too; the frontend check is only a convenience.
+    # Strip first, so "   " fails min_length. The limit is enforced on the
+    # server too; the frontend check is only a convenience.
+    model_config = ConfigDict(str_strip_whitespace=True)
     text: str = Field(min_length=1, max_length=MAX_LENGTH)
 
 
 @router.get("")
 def list_todos():
-    return _todos
+    with db.pool.connection() as conn:
+        return conn.execute("SELECT id, text FROM todos ORDER BY id").fetchall()
 
 
 @router.post("", status_code=201)
 def create_todo(payload: TodoIn):
-    todo = {"id": next(_ids), "text": payload.text.strip()}
-    _todos.append(todo)
+    with db.pool.connection() as conn:
+        todo = conn.execute(
+            "INSERT INTO todos (text) VALUES (%s) RETURNING id, text",
+            (payload.text,),
+        ).fetchone()
     logger.info("Created todo %s", todo["id"])
     return todo

@@ -89,5 +89,6 @@ kubectl create secret generic postgres-auth \
   --from-literal=POSTGRES_PASSWORD='pingpong'
 
 gh release create 2.7 --target=main --notes "2.7. The project is complete"
+docker stop pingpong-db && docker rm pingpong-db 
 
 ```

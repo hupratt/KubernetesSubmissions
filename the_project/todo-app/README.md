@@ -83,3 +83,28 @@ docker build -t hupratt/todo-app:2.6 .
 docker push hupratt/todo-app:2.6
 gh release create 2.6 --target=main --notes "2.6. The project is complete"
 ```
+
+make it run in a db
+
+```bash
+docker run -d --name todos-db \
+  -e POSTGRES_USER=todos \
+  -e POSTGRES_PASSWORD=todos \
+  -e POSTGRES_DB=todos \
+  -p 5432:5432 \
+  -v todos-pgdata:/var/lib/postgresql/data \
+  postgres:16-alpine
+
+uv add "psycopg[binary]" psycopg_pool
+docker build -t hupratt/log_output:2.8 .
+docker push hupratt/log_output:2.8
+
+kubectl create secret generic postgres-auth \
+  --namespace postgres \
+  --from-literal=POSTGRES_USER=todos \
+  --from-literal=POSTGRES_PASSWORD='todos'
+
+gh release create 2.8 --target=main --notes "2.8. The project is complete"
+docker stop todos-db && docker rm todos-db 
+
+```
