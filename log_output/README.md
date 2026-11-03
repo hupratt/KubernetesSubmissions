@@ -68,3 +68,26 @@ docker push hupratt/log_output:2.5
 gh release create 2.5 --target=main --notes "2.5. The project is complete"
 
 ```
+
+set up a test database locally
+
+```bash
+docker run -d --name pingpong-db \
+  -e POSTGRES_USER=pingpong \
+  -e POSTGRES_PASSWORD=pingpong \
+  -e POSTGRES_DB=pingpong \
+  -p 5432:5432 \
+  -v pingpong-pgdata:/var/lib/postgresql/data \
+  postgres:16-alpine
+
+docker build -t hupratt/log_output:2.7 .
+docker push hupratt/log_output:2.7
+
+kubectl create secret generic postgres-auth \
+  --namespace postgres \
+  --from-literal=POSTGRES_USER=pingpong \
+  --from-literal=POSTGRES_PASSWORD='pingpong'
+
+gh release create 2.7 --target=main --notes "2.7. The project is complete"
+
+```

@@ -6,7 +6,9 @@ ENV PYTHONUNBUFFERED=1
  
 WORKDIR /app
 COPY . .
- 
+
+RUN pip install --no-cache-dir "psycopg[binary]" psycopg_pool
+
 RUN useradd --no-create-home --shell /usr/sbin/nologin appuser \
  && chown appuser /app
 USER appuser

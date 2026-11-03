@@ -1,36 +1,61 @@
 import os
-import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-PING_FILE = os.environ.get("PING_FILE", "./pingpong.log")
+import psycopg
+from psycopg_pool import ConnectionPool
+
 PORT = int(os.environ.get("PORT", "8001"))
 
-lock = threading.Lock()
+# Either DATABASE_URL, or the standard PG* variables (PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE)
+DSN = os.environ.get("DATABASE_URL", "postgresql://pingpong:pingpong@localhost:5432/pingpong")
+
+pool = ConnectionPool(DSN, min_size=1, max_size=10, open=False)
 
 
-def load_counter(path):
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return int(f.read().strip())
-    except (FileNotFoundError, ValueError):
-        return 0
+def init_db(retries=30, delay=2):
+    """Wait for Postgres (useful in Docker/Kubernetes) and create the table."""
+    for attempt in range(1, retries + 1):
+        try:
+            pool.open(wait=True, timeout=5)
+            with pool.connection() as conn:
+                conn.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS counter (
+                        id    INTEGER PRIMARY KEY CHECK (id = 1),
+                        value BIGINT NOT NULL
+                    )
+                    """
+                )
+                conn.execute(
+                    "INSERT INTO counter (id, value) VALUES (1, 0) ON CONFLICT (id) DO NOTHING"
+                )
+            return
+        except Exception as e:
+            print(f"DB not ready ({attempt}/{retries}): {e}", flush=True)
+            time.sleep(delay)
+    raise SystemExit("Could not connect to the database")
 
 
-def save_counter(path, value):
-    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-    tmp = path + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        f.write(f"{value}\n")
-    os.replace(tmp, path)
+def increment():
+    """Atomically increment and return the value before the increment."""
+    with pool.connection() as conn:
+        row = conn.execute(
+            "UPDATE counter SET value = value + 1 WHERE id = 1 RETURNING value - 1"
+        ).fetchone()
+    return row[0]
 
 
-counter = load_counter(PING_FILE)
+def read_counter():
+    with pool.connection() as conn:
+        row = conn.execute("SELECT value FROM counter WHERE id = 1").fetchone()
+    return row[0]
 
 
 class Handler(BaseHTTPRequestHandler):
-    def respond(self, text):
+    def respond(self, text, status=200):
         body = text.encode()
-        self.send_response(200)
+        self.send_response(status)
         self.send_header("Content-Type", "text/plain; charset=utf-8")
         self.send_header("Cache-Control", "no-store")
         self.send_header("Content-Length", str(len(body)))
@@ -38,24 +63,22 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
-        global counter
         path = self.path.split("?")[0].rstrip("/") or "/"
-        if path == "/pingpong":
-            with lock:
-                text = f"pong {counter}"
-                counter += 1
-                save_counter(PING_FILE, counter)
-            self.respond(text)
-        elif path == "/pings":
-            with lock:
-                value = counter
-            self.respond(str(value))
-        else:
-            self.send_error(404)
+        try:
+            if path == "/pingpong":
+                self.respond(f"pong {increment()}")
+            elif path == "/pings":
+                self.respond(str(read_counter()))
+            else:
+                self.send_error(404)
+        except psycopg.Error as e:
+            print(f"DB error: {e}", flush=True)
+            self.respond("database error", status=503)
 
     def log_message(self, *args):
         pass
 
 
 if __name__ == "__main__":
+    init_db()
     ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
