@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: todo
-          image: hupratt/todo-app:2.6
+          image: hupratt/todo-app:2.8
           imagePullPolicy: Always
           env:
             - name: UVICORN_PORT
@@ -23,7 +23,12 @@ spec:
             - name: PICSUM_URL
               value: "https://picsum.photos/600"
             - name: TTL_SECONDS
-              value: "5"          
+              value: "5"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: todoapp-secret
+                  key: DATABASE_URL
           ports:
             - name: http
               containerPort: 9001

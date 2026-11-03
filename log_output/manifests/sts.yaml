@@ -30,11 +30,9 @@ spec:
   serviceName: postgres-headless
   replicas: 1
   podManagementPolicy: OrderedReady
-
   selector:
     matchLabels:
       app: postgres
-
   template:
     metadata:
       labels:
@@ -47,31 +45,83 @@ spec:
           ports:
             - name: postgres
               containerPort: 5432
-
           envFrom:
             - secretRef:
                 name: postgres-auth
-
           readinessProbe:
             exec:
               command:
-                - pg_isready
-                - -U
-                - postgres
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
             periodSeconds: 10
-
           startupProbe:
             exec:
               command:
-                - pg_isready
-                - -U
-                - postgres
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
             periodSeconds: 5
             failureThreshold: 30
-
           volumeMounts:
             - name: data
               mountPath: /var/lib/postgresql/data
+
+        - name: db-bootstrap
+          image: postgres:17-alpine
+          env:
+            - name: PGHOST
+              value: localhost
+            - name: PGDATABASE
+              value: postgres
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth
+                  key: POSTGRES_USER
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth
+                  key: POSTGRES_PASSWORD
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+
+              until pg_isready; do
+                sleep 2
+              done
+
+              psql -v ON_ERROR_STOP=1 -v pw="$POSTGRES_SUPERUSER_PASSWORD" <<'SQL'
+              SELECT format('CREATE ROLE postgres SUPERUSER LOGIN PASSWORD %L', :'pw')
+                WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'postgres')
+              \gexec
+
+              SELECT 'CREATE DATABASE todos'
+                WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'todos')
+              \gexec
+
+              SELECT 'CREATE DATABASE pingpong'
+                WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'pingpong')
+              \gexec
+              SQL
+
+              echo "bootstrap done"
+
+              while true; do
+                sleep 3600
+              done
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
 
   volumeClaimTemplates:
     - metadata:

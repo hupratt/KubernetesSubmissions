@@ -83,10 +83,10 @@ docker run -d --name pingpong-db \
 docker build -t hupratt/log_output:2.7 .
 docker push hupratt/log_output:2.7
 
-kubectl create secret generic postgres-auth \
+kubectl create secret generic postgres-auth -n postgres \
   --namespace postgres \
-  --from-literal=POSTGRES_USER=pingpong \
-  --from-literal=POSTGRES_PASSWORD='pingpong'
+  --from-literal=POSTGRES_USER=postgres \
+  --from-literal=POSTGRES_PASSWORD='strongpw'
 
 gh release create 2.7 --target=main --notes "2.7. The project is complete"
 docker stop pingpong-db && docker rm pingpong-db 

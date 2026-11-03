@@ -96,13 +96,12 @@ docker run -d --name todos-db \
   postgres:16-alpine
 
 uv add "psycopg[binary]" psycopg_pool
-docker build -t hupratt/log_output:2.8 .
-docker push hupratt/log_output:2.8
+docker build -t hupratt/todo-app:2.8 . && docker push hupratt/todo-app:2.8
 
-kubectl create secret generic postgres-auth \
+kubectl create secret generic postgres-auth -n postgres \
   --namespace postgres \
-  --from-literal=POSTGRES_USER=todos \
-  --from-literal=POSTGRES_PASSWORD='todos'
+  --from-literal=POSTGRES_USER=postgres \
+  --from-literal=POSTGRES_PASSWORD='strongpw'
 
 gh release create 2.8 --target=main --notes "2.8. The project is complete"
 docker stop todos-db && docker rm todos-db 
