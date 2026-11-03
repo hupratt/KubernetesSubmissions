@@ -105,5 +105,7 @@ kubectl create secret generic postgres-auth -n postgres \
 
 gh release create 2.8 --target=main --notes "2.8. The project is complete"
 docker stop todos-db && docker rm todos-db 
+gh release create 2.9 --target=main --notes "2.9. The project is complete"
+gh release create 2.10 --target=main --notes "2.10. The project is complete"
 
 ```
