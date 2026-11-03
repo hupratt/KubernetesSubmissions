@@ -1,4 +1,3 @@
-
 cluster:
   name: my-cluster
 
@@ -15,6 +14,48 @@ podLogsViaLoki:
 collectors:
   alloy-singleton:
     presets: [filesystem-log-reader]
+    # Enable Kubernetes container log collection/discovery
+    config: |
+      discovery.kubernetes "pods" {
+        role = "pod"
+      }
+
+      discovery.relabel "pod_logs" {
+        targets = discovery.kubernetes.pods.targets
+
+        # Keep only the namespace where your app runs (e.g., project)
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          action        = "keep"
+          regex         = "project"
+        }
+
+        # Keep only your todo application pods
+        rule {
+          source_labels = ["__meta_kubernetes_pod_label_app"]
+          action        = "keep"
+          regex         = "todo"
+        }
+
+        # Extract useful metadata labels for Loki
+        rule {
+          source_labels = ["__meta_kubernetes_pod_name"]
+          target_label  = "pod"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          target_label  = "namespace"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_name"]
+          target_label  = "container"
+        }
+      }
+
+      loki.source.kubernetes "pod_logs" {
+        targets    = discovery.relabel.pod_logs.output
+        forward_to = [loki.write.localLoki.receiver]
+      }
 
 selfReporting:
   enabled: false

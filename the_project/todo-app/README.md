@@ -108,4 +108,34 @@ docker stop todos-db && docker rm todos-db
 gh release create 2.9 --target=main --notes "2.9. The project is complete"
 gh release create 2.10 --target=main --notes "2.10. The project is complete"
 
+curl -X POST "http://localhost:8081/todos" \
+     -H "Content-Type: application/json" \
+     -d '{"text": "'$(python3 -c "print('A' * 141)")'"}'
+"detail":[{"type":"string_too_long","loc":["body","text"],"msg":"String should have at most 140 characters",
+
+curl -X POST "http://localhost:8081/todos" \
+     -H "Content-Type: application/json" \
+     -d '{"text": "'$(python3 -c "print('A' * 140)")'"}'
+{"id":10,"text":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}%
+
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:src.todo_app.db:Schema ready on {'db': 'todos', 'addr': IPv4Address('10.42.2.46'), 'port': 5432}
+INFO:src.todo_app.image:No cached image on disk yet
+INFO:src.todo_app.main:Server started on port 9001
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:9001 (Press CTRL+C to quit)
+INFO:     10.42.1.52:52344 - "GET / HTTP/1.1" 304 Not Modified
+INFO:     10.42.1.52:52344 - "GET /todos HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://picsum.photos/600 "HTTP/1.1 302 Found"
+INFO:httpx:HTTP Request: GET https://fastly.picsum.photos/id/74/600/600.jpg?hmac=cAuiUh13MRCGmPEUkyXGDV_Msi9bunNIjO0lCNUPTBg "HTTP/1.1 200 OK"
+INFO:     10.42.1.52:52358 - "GET /api/image HTTP/1.1" 200 OK
+INFO:src.todo_app.todos:Received todo request (3 chars): 'sfd'
+INFO:src.todo_app.todos:Created todo 9
+INFO:     10.42.1.52:51206 - "POST /todos HTTP/1.1" 201 Created
+INFO:     10.42.1.52:42472 - "POST /todos HTTP/1.1" 422 Unprocessable Content
+INFO:src.todo_app.todos:Received todo request (140 chars): 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+INFO:src.todo_app.todos:Created todo 10
+INFO:     10.42.1.52:54408 - "POST /todos HTTP/1.1" 201 Created
+
 ```

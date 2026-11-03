@@ -27,6 +27,9 @@ def list_todos():
 
 @router.post("", status_code=201)
 def create_todo(payload: TodoIn):
+    # Log every incoming todo request text along with its character count
+    logger.info("Received todo request (%d chars): %r", len(payload.text), payload.text)
+
     with db.pool.connection() as conn:
         todo = conn.execute(
             "INSERT INTO todos (text) VALUES (%s) RETURNING id, text",
