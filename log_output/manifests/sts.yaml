@@ -48,6 +48,9 @@ spec:
           envFrom:
             - secretRef:
                 name: postgres-auth
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           readinessProbe:
             exec:
               command:
@@ -129,7 +132,7 @@ spec:
       spec:
         accessModes:
           - ReadWriteOnce
-        storageClassName: local-path
+        storageClassName: standard-rwo
         resources:
           requests:
             storage: 10Gi
