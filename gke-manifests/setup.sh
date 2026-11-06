@@ -7,3 +7,5 @@ gcloud auth login
 gcloud config set project project-f5db746b-2bc2-4fda-a87 
 gcloud config list project
 gcloud container clusters create dwk-cluster --zone=europe-north1-b --cluster-version=1.37 --disk-size=32 --num-nodes=4 --machine-type=e2-medium
+
+gh release create 3.1 --target=main --notes "3.1. The project is complete"
