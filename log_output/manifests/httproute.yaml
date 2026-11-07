@@ -5,13 +5,27 @@ metadata:
   namespace: exercises
 spec:
   parentRefs:
-  - name: my-gateway
-    namespace: default
+    - name: my-gateway
+      namespace: default
   rules:
     - matches:
         - path:
             type: PathPrefix
             value: /pingpong
+      filters:
+      # The Gateway receives /pingpong, rewrites it to /, and the app sees /
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: pingpong-lb
+          port: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /pings
       backendRefs:
         - name: pingpong-lb
           port: 80
@@ -22,21 +36,22 @@ spec:
       backendRefs:
         - name: logoutput-lb
           port: 80
-# ---
+---
 
-# apiVersion: networking.gke.io/v1
-# kind: HealthCheckPolicy
-# metadata:
-#   name: pingpong-hc
-#   namespace: exercises
-# spec:
-#   default:
-#     config:
-#       type: HTTP
-#       httpHealthCheck:
-#         port: 8001
-#         requestPath: /pingpong
-#   targetRef:
-#     group: ""
-#     kind: Service
-#     name: pingpong-lb
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: pingpong-hc
+  namespace: exercises
+spec:
+  default:
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: 8001
+        requestPath: /pings
+  targetRef:
+    group: ""
+    kind: Service
+    name: pingpong-lb
+

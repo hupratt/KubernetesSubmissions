@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: logoutput-expose
-          image: hupratt/log_output:2.8
+          image: hupratt/log_output:3.4
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
@@ -32,7 +32,7 @@ spec:
               mountPath: /config
               readOnly: true
         - name: logoutput-producer
-          image: hupratt/log_output:2.8
+          image: hupratt/log_output:3.4
           imagePullPolicy: Always
           env:
             - name: DATABASE_URL
@@ -45,7 +45,7 @@ spec:
             - containerPort: 8001
           readinessProbe:
             httpGet:
-              path: /pingpong
+              path: /pings
               port: 8001
       volumes:
         - name: information-volume

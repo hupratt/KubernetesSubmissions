@@ -93,5 +93,6 @@ docker stop pingpong-db && docker rm pingpong-db
 gh release create 3.2 --target=main --notes "3.2. The project is complete"
 gcloud container clusters update dwk-cluster --location=europe-north1-b --gateway-api=standard
 gh release create 3.3 --target=main --notes "3.3. The project is complete"
+gh release create 3.4 --target=main --notes "3.4. The project is complete"
 
 ```

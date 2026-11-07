@@ -65,7 +65,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = self.path.split("?")[0].rstrip("/") or "/"
         try:
-            if path == "/pingpong":
+            if path == "/":
                 self.respond(f"pong {increment()}")
             elif path == "/pings":
                 self.respond(str(read_counter()))
