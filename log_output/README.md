@@ -90,5 +90,8 @@ kubectl create secret generic postgres-auth -n postgres \
 
 gh release create 2.7 --target=main --notes "2.7. The project is complete"
 docker stop pingpong-db && docker rm pingpong-db 
+gh release create 3.2 --target=main --notes "3.2. The project is complete"
+gcloud container clusters update dwk-cluster --location=europe-north1-b --gateway-api=standard
+gh release create 3.3 --target=main --notes "3.3. The project is complete"
 
 ```

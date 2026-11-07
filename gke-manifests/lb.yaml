@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: seedimage-svc
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: seedimage
   ports:
