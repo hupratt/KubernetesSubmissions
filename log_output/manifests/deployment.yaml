@@ -43,6 +43,10 @@ spec:
           command: ["python", "pingpong.py"]
           ports:
             - containerPort: 8001
+          readinessProbe:
+            httpGet:
+              path: /pingpong
+              port: 8001
       volumes:
         - name: information-volume
           configMap:
