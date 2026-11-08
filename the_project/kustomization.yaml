@@ -10,4 +10,4 @@ resources:
   - manifests/ns.yaml
 images:
   - name: PROJECT/IMAGE
-    newName: hupratt/todo-app:2.10
+    newName: my-docker-reg/dwk-environments
