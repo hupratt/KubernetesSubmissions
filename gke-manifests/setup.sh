@@ -25,6 +25,17 @@ gcloud projects add-iam-policy-binding project-f5db746b-2bc2-4fda-a87 \
   --role="roles/compute.networkAdmin" \
   --member="serviceAccount:github-actions-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com"
 
+# so that github's SA can delete NEGs
+
+gcloud iam roles create negDelete \
+  --project=project-f5db746b-2bc2-4fda-a87 \
+  --title="NEG delete" \
+  --permissions=compute.networkEndpointGroups.delete
+
+gcloud projects add-iam-policy-binding project-f5db746b-2bc2-4fda-a87 \
+  --role="projects/project-f5db746b-2bc2-4fda-a87/roles/negDelete" \
+  --member="serviceAccount:github-actions-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com"
+
 gcloud iam workload-identity-pools create "github-pool" \
   --location="global" \
   --display-name="GitHub Actions Pool"
@@ -52,3 +63,13 @@ gcloud artifacts repositories add-iam-policy-binding my-docker-reg \
 gh release create 3.6 --target=main --notes "3.6. The project is complete"
 gh release create 3.7 --target=main --notes "3.7. The project is complete"
 gh release create 3.8 --target=main --notes "3.8. The project is complete"
+
+
+# debug neg and backend
+
+➜ ~ gcloud compute backend-services list --global --filter="alleluya"     
+NAME                                             BACKENDS                                                                             PROTOCOL
+gkegw1-h6d9-alleluya-todo-svc-2345-b31olt0j2l79  europe-north1-b/networkEndpointGroups/k8s1-196b4833-alleluya-todo-svc-2345-57f7401d  HTTP
+➜ ~ gcloud compute network-endpoint-groups list --filter="alleluya"  
+NAME                                           LOCATION         ENDPOINT_TYPE   SIZE
+k8s1-196b4833-alleluya-todo-svc-2345-57f7401d  europe-north1-b  GCE_VM_IP_PORT  1
