@@ -9,3 +9,30 @@ gcloud config list project
 gcloud container clusters create dwk-cluster --zone=europe-north1-b --cluster-version=1.37 --disk-size=32 --num-nodes=4 --machine-type=e2-medium --gateway-api=standard
 
 gh release create 3.1 --target=main --notes "3.1. The project is complete"
+gh release create 3.5 --target=main --notes "3.5. The project is complete"
+
+
+gcloud iam service-accounts create "github-actions-sa" --display-name="GitHub Actions SA"
+gcloud projects add-iam-policy-binding project-f5db746b-2bc2-4fda-a87 \
+  --role="roles/artifactregistry.writer" \
+  --member="serviceAccount:github-actions-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com"
+gcloud projects add-iam-policy-binding project-f5db746b-2bc2-4fda-a87 \
+  --role="roles/container.admin" \
+  --member="serviceAccount:github-actions-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com"
+
+gcloud iam workload-identity-pools create "github-pool" \
+  --location="global" \
+  --display-name="GitHub Actions Pool"
+
+gcloud iam workload-identity-pools providers create-oidc "github-provider" \
+  --location="global" \
+  --workload-identity-pool="github-pool" \
+  --display-name="GitHub provider" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" \
+  --attribute-condition="assertion.repository=='hupratt/KubernetesSubmissions'" \
+  --issuer-uri="https://token.actions.githubusercontent.com"
+
+gcloud iam service-accounts add-iam-policy-binding \
+  github-actions-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/projects/602773526588/locations/global/workloadIdentityPools/github-pool/attribute.repository/hupratt/KubernetesSubmissions"
