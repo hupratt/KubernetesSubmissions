@@ -20,6 +20,11 @@ gcloud projects add-iam-policy-binding project-f5db746b-2bc2-4fda-a87 \
   --role="roles/container.admin" \
   --member="serviceAccount:github-actions-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com"
 
+# so that github's SA can list NEGs
+gcloud projects add-iam-policy-binding project-f5db746b-2bc2-4fda-a87 \
+  --role="roles/compute.networkAdmin" \
+  --member="serviceAccount:github-actions-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com"
+
 gcloud iam workload-identity-pools create "github-pool" \
   --location="global" \
   --display-name="GitHub Actions Pool"
