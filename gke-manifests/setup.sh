@@ -36,3 +36,6 @@ gcloud iam service-accounts add-iam-policy-binding \
   github-actions-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com \
   --role="roles/iam.workloadIdentityUser" \
   --member="principalSet://iam.googleapis.com/projects/602773526588/locations/global/workloadIdentityPools/github-pool/attribute.repository/hupratt/KubernetesSubmissions"
+
+
+gh release create 3.6 --target=main --notes "3.6. The project is complete"

@@ -37,6 +37,7 @@ jobs:
           cluster_name: '${{ env.GKE_CLUSTER }}'
           project_id: '${{ env.PROJECT_ID }}'
           location: '${{ env.GKE_ZONE }}'
+          WORKLOAD_IDENTITY_PROVIDER: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
 
       - name: 'Set up Docker Buildx'
         run: gcloud auth configure-docker "$REGISTRY"
