@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: wikipedia-todo
-  namespace: exercises
+  namespace: ${NAMESPACE}
 spec:
   schedule: "0 * * * *"
   concurrencyPolicy: Forbid
