@@ -45,3 +45,5 @@ gcloud artifacts repositories add-iam-policy-binding my-docker-reg \
   --role=roles/artifactregistry.reader
 
 gh release create 3.6 --target=main --notes "3.6. The project is complete"
+gh release create 3.7 --target=main --notes "3.7. The project is complete"
+gh release create 3.8 --target=main --notes "3.8. The project is complete"
