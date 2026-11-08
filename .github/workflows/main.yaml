@@ -57,11 +57,9 @@ jobs:
       - name: Publish
         run: docker push $IMAGE_TAG
       
-      - name: Set up Kustomize
-        uses: imranismail/setup-kustomize@v3
-
       - name: Deploy
         run: |-
+          kustomize version
           kustomize edit set image PROJECT/IMAGE=$IMAGE_TAG
           kustomize build . | kubectl apply -f -
           kubectl rollout status deployment $SERVICE
