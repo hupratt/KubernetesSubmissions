@@ -20,5 +20,5 @@ spec:
             type: PathPrefix
             value: /todos
       backendRefs:
-        - name: todo-backend-svc
+        - name: todo-svc
           port: 2345
