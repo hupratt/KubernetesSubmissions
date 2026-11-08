@@ -59,10 +59,10 @@ jobs:
       
       - name: Deploy
         run: |-
-          if [ "$CI_COMMIT_BRANCH" = "main" ]; then
+          if [ "$GITHUB_REF_NAME" = "main" ]; then
             NAMESPACE=project
           else
-            NAMESPACE=${GITHUB_REF#refs/heads/}
+            NAMESPACE=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | tr '/_' '--')
           fi
           kubectl create namespace $NAMESPACE || true
           kubectl config set-context --current --namespace=$NAMESPACE}
