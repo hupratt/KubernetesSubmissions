@@ -38,24 +38,34 @@ jobs:
         run: |
           NAMESPACE=$(echo "$REF_NAME" | tr '[:upper:]' '[:lower:]' | tr '/_' '--')
 
-          # svcneg objects are named after the real NEG, so record them before anything is deleted
+          # record NEG names before anything is deleted
           NEGS=$(kubectl get svcneg -n "$NAMESPACE" -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || true)
+          echo "NEGs to clean up: ${NEGS:-none}"
 
-          # remove routing and services
           kubectl delete httproute --all -n "$NAMESPACE" --ignore-not-found --wait=true --timeout=300s
           kubectl delete service --all -n "$NAMESPACE" --ignore-not-found --wait=true --timeout=300s
 
-          # the svcneg and the NEG still exists in GCP, delete its backend service, then the NEG
           for NEG in $NEGS; do
-            gcloud compute network-endpoint-groups list \
-              --filter="name=$NEG" --format="value(zone.basename())" |
-            while read -r ZONE; do
-              for BS in $(gcloud compute backend-services list --global \
-                            --filter="backends.group~/${NEG}$" --format="value(name)"); do
-                gcloud compute backend-services delete "$BS" --global --quiet
+            DONE=false
+            for i in $(seq 1 30); do
+              # find backend services pointing at this NEG (client-side match, no gcloud filter)
+              for BS in $(gcloud compute backend-services list --global --format=json \
+                            | jq -r --arg neg "$NEG" '.[] | select(any(.backends[]?; .group | endswith("/" + $neg))) | .name'); do
+                gcloud compute backend-services delete "$BS" --global --quiet || echo "backend service $BS not deletable yet"
               done
-              gcloud compute network-endpoint-groups delete "$NEG" --zone="$ZONE" --quiet
+
+              if OUT=$(gcloud compute network-endpoint-groups delete "$NEG" --zone="$GKE_ZONE" --quiet 2>&1); then
+                echo "deleted $NEG"; DONE=true; break
+              fi
+              if echo "$OUT" | grep -qi "not found"; then
+                echo "$NEG already gone"; DONE=true; break
+              fi
+              echo "$OUT" >&2
+              echo "retrying ($i/30)..."
+              sleep 10
             done
+
+            [ "$DONE" = true ] || { echo "could not delete NEG $NEG" >&2; exit 1; }
           done
 
           kubectl delete namespace "$NAMESPACE" --ignore-not-found --timeout=300s
