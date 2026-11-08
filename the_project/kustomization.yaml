@@ -7,7 +7,6 @@ resources:
   - manifests/httproute.yaml
   - manifests/secret.yaml
   - manifests/service.yaml
-  - manifests/ns.yaml
 images:
   - name: PROJECT/IMAGE
     newName: my-docker-reg/todo-app
