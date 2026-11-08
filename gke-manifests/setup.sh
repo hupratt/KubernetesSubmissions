@@ -73,3 +73,6 @@ gkegw1-h6d9-alleluya-todo-svc-2345-b31olt0j2l79  europe-north1-b/networkEndpoint
 ➜ ~ gcloud compute network-endpoint-groups list --filter="alleluya"  
 NAME                                           LOCATION         ENDPOINT_TYPE   SIZE
 k8s1-196b4833-alleluya-todo-svc-2345-57f7401d  europe-north1-b  GCE_VM_IP_PORT  1
+
+
+gh release create 3.9 --target=main --notes "3.9. The project is complete"
