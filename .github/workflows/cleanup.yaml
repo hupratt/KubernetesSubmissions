@@ -38,13 +38,24 @@ jobs:
         run: |
           NAMESPACE=$(echo "$REF_NAME" | tr '[:upper:]' '[:lower:]' | tr '/_' '--')
 
-          # remove routing first so the Gateway controller tears down the backend service
-          kubectl delete httproute,gateway --all -n "$NAMESPACE" --ignore-not-found --wait=true --timeout=300s
+          # svcneg objects are named after the real NEG, so record them before anything is deleted
+          NEGS=$(kubectl get svcneg -n "$NAMESPACE" -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || true)
 
-          # wait for the NEGs to be cleaned up (up to ~5 min)
-          for i in $(seq 1 30); do
-            [ -z "$(kubectl get svcneg -n "$NAMESPACE" -o name 2>/dev/null)" ] && break
-            sleep 10
+          # remove routing and services
+          kubectl delete httproute --all -n "$NAMESPACE" --ignore-not-found --wait=true --timeout=300s
+          kubectl delete service --all -n "$NAMESPACE" --ignore-not-found --wait=true --timeout=300s
+
+          # the svcneg and the NEG still exists in GCP, delete its backend service, then the NEG
+          for NEG in $NEGS; do
+            gcloud compute network-endpoint-groups list \
+              --filter="name=$NEG" --format="value(zone.basename())" |
+            while read -r ZONE; do
+              for BS in $(gcloud compute backend-services list --global \
+                            --filter="backends.group~/${NEG}$" --format="value(name)"); do
+                gcloud compute backend-services delete "$BS" --global --quiet
+              done
+              gcloud compute network-endpoint-groups delete "$NEG" --zone="$ZONE" --quiet
+            done
           done
 
           kubectl delete namespace "$NAMESPACE" --ignore-not-found --timeout=300s
