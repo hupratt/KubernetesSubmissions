@@ -65,8 +65,8 @@ jobs:
             NAMESPACE=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | tr '/_' '--')
           fi
           kubectl create namespace $NAMESPACE || true
-          kubectl config set-context --current --namespace=$NAMESPACE}
-          kustomize edit set namespace $NAMESPACE}
+          kubectl config set-context --current --namespace=$NAMESPACE
+          kustomize edit set namespace $NAMESPACE
           kustomize edit set image PROJECT/IMAGE=$IMAGE_TAG
           kustomize build . | kubectl apply -f -
           kubectl rollout status deployment $SERVICE -n projects
