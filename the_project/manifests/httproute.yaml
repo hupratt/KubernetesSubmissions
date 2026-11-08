@@ -6,6 +6,7 @@ metadata:
 spec:
   parentRefs:
   - name: my-gateway
+    namespace: default
   rules:
     - matches:
         - path:
