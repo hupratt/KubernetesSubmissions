@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: todo
-  namespace: project
+  namespace: projects
 spec:
   replicas: 1
   selector:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: todo
-          image: hupratt/todo-app:2.10
+          image: PROJECT/IMAGE
           imagePullPolicy: Always
           env:
             - name: UVICORN_PORT
