@@ -11,7 +11,7 @@ gcloud container clusters create dwk-cluster --zone=europe-north1-b --cluster-ve
 gh release create 3.1 --target=main --notes "3.1. The project is complete"
 gh release create 3.5 --target=main --notes "3.5. The project is complete"
 
-
+# setup a service account that can deploy to the GCP cluster
 gcloud iam service-accounts create "github-actions-sa" --display-name="GitHub Actions SA"
 gcloud projects add-iam-policy-binding project-f5db746b-2bc2-4fda-a87 \
   --role="roles/artifactregistry.writer" \
@@ -35,7 +35,13 @@ gcloud iam workload-identity-pools providers create-oidc "github-provider" \
 gcloud iam service-accounts add-iam-policy-binding \
   github-actions-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com \
   --role="roles/iam.workloadIdentityUser" \
-  --member="principalSet://iam.googleapis.com/projects/602773526588/locations/global/workloadIdentityPools/github-pool/attribute.repository/hupratt/KubernetesSubmissions"
+  --member="principalSet
 
+# allows the cluster to pull docker images from the registry by giving the default service account read perms
+gcloud artifacts repositories add-iam-policy-binding my-docker-reg \
+  --location=europe-north1 \
+  --project=project-f5db746b-2bc2-4fda-a87 \
+  --member="serviceAccount:602773526588-compute@developer.gserviceaccount.com" \
+  --role=roles/artifactregistry.reader
 
 gh release create 3.6 --target=main --notes "3.6. The project is complete"
