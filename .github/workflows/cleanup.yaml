@@ -37,4 +37,14 @@ jobs:
           REF_NAME: ${{ github.event.ref }}
         run: |
           NAMESPACE=$(echo "$REF_NAME" | tr '[:upper:]' '[:lower:]' | tr '/_' '--')
-          kubectl delete namespace "$NAMESPACE" --ignore-not-found
+
+          # remove routing first so the Gateway controller tears down the backend service
+          kubectl delete httproute,gateway --all -n "$NAMESPACE" --ignore-not-found --wait=true --timeout=300s
+
+          # wait for the NEGs to be cleaned up (up to ~5 min)
+          for i in $(seq 1 30); do
+            [ -z "$(kubectl get svcneg -n "$NAMESPACE" -o name 2>/dev/null)" ] && break
+            sleep 10
+          done
+
+          kubectl delete namespace "$NAMESPACE" --ignore-not-found --timeout=300s
