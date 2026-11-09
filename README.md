@@ -1,5 +1,9 @@
 # KubernetesSubmissions
 
+#### GKE logs
+
+![logs](./the_project/asset/swappy-20261109-225016.png)
+
 ## Exercises
 
 ### Chapter 2

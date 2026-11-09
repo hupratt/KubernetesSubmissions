@@ -116,3 +116,6 @@ kubectl create secret -n project generic storage-sa-key --from-file=key.json=key
 gcloud storage buckets update gs://todo_bucket_1 --lifecycle-file=retention.json
 
 gh release create 3.10 --target=main --notes "3.10. The project is complete"
+
+gh release create 3.11 --target=main --notes "3.11. The project is complete"
+gh release create 3.12 --target=main --notes "3.12. The project is complete"
