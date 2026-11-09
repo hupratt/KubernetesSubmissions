@@ -22,7 +22,7 @@ spec:
                 secretName: storage-sa-key
           initContainers:
             - name: pg-dump
-              image: postgres:16-alpine   # match your server's major version
+              image: postgres:17-alpine   # match your server's major version
               env:
                 - name: DATABASE_URL
                   valueFrom:
