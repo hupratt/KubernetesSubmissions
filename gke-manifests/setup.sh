@@ -110,7 +110,9 @@ gcloud iam service-accounts keys create key.json \
   --iam-account=my-storage-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com
 
 # import into k8s
-kubectl create secret generic storage-sa-key --from-file=key.json=key.json
+kubectl create secret -n project generic storage-sa-key --from-file=key.json=key.json
 
 # apply rentention policy
 gcloud storage buckets update gs://todo_bucket_1 --lifecycle-file=retention.json
+
+gh release create 3.10 --target=main --notes "3.10. The project is complete"

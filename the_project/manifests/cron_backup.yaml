@@ -22,7 +22,7 @@ spec:
                 secretName: storage-sa-key
           initContainers:
             - name: pg-dump
-              image: postgres:17-alpine   # match your server's major version
+              image: postgres:17
               env:
                 - name: DATABASE_URL
                   valueFrom:
@@ -33,8 +33,8 @@ spec:
               args:
                 - |
                   set -eu
-                  pg_dump -Fc --no-owner -d "$DATABASE_URL" \
-                    -f /backup/todos-$(date +%Y-%m-%d_%H%M%S).dump
+                  pg_dump --no-owner --clean --if-exists -d "$DATABASE_URL" \
+                    -f /backup/todos-$(date +%Y-%m-%d_%H%M%S).sql
                   ls -lh /backup
               volumeMounts:
                 - name: backup
