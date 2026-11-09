@@ -47,7 +47,7 @@ spec:
                 - |
                   set -eu
                   gcloud auth activate-service-account --key-file=/secrets/key.json
-                  gcloud storage cp /backup/*.dump gs://todo_bucket_1/todo-db/
+                  gcloud storage cp /backup/*.sql gs://todo_bucket_1/todo-db/
               volumeMounts:
                 - name: backup
                   mountPath: /backup
