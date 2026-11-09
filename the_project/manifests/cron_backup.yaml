@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: todo-db-backup
+  namespace: ${NAMESPACE}
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          volumes:
+            - name: backup
+              emptyDir: {}
+            - name: gcp-key
+              secret:
+                secretName: storage-sa-key
+          initContainers:
+            - name: pg-dump
+              image: postgres:16-alpine   # match your server's major version
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: todoapp-secret
+                      key: DATABASE_URL
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -eu
+                  pg_dump -Fc --no-owner -d "$DATABASE_URL" \
+                    -f /backup/todos-$(date +%Y-%m-%d_%H%M%S).dump
+                  ls -lh /backup
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+          containers:
+            - name: upload
+              image: google/cloud-sdk:slim
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -eu
+                  gcloud auth activate-service-account --key-file=/secrets/key.json
+                  gcloud storage cp /backup/*.dump gs://todo_bucket_1/todo-db/
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+                - name: gcp-key
+                  mountPath: /secrets
+                  readOnly: true

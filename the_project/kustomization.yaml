@@ -3,7 +3,8 @@ kind: Kustomization
 namespace: ${NAMESPACE}
 resources:
   - manifests/cm.yaml
-  - manifests/cron.yaml
+  - manifests/cron_backup.yaml
+  - manifests/cron_wikipedia.yaml
   - manifests/deployment.yaml
   - manifests/httproute.yaml
   - manifests/secret.yaml

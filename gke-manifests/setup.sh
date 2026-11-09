@@ -76,3 +76,41 @@ k8s1-196b4833-alleluya-todo-svc-2345-57f7401d  europe-north1-b  GCE_VM_IP_PORT  
 
 
 gh release create 3.9 --target=main --notes "3.9. The project is complete"
+
+
+# pg_dump SA via cronjob
+
+gcloud iam service-accounts create "my-storage-sa" --display-name="Pod Storage SA"
+
+gcloud projects add-iam-policy-binding project-f5db746b-2bc2-4fda-a87 \
+  --role="roles/storage.objectCreator" \
+  --member="serviceAccount:my-storage-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com"
+
+gcloud projects add-iam-policy-binding project-f5db746b-2bc2-4fda-a87 \
+  --role="roles/storage.objectViewer" \
+  --member="serviceAccount:my-storage-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com"
+
+# lets you grant yourself policyAdmin on the org
+gcloud organizations add-iam-policy-binding 19073322258 \
+  --member="user:rboui534@gmail.com" \
+  --role="roles/orgpolicy.policyAdmin"
+
+# disable enforcement for just this project
+cat > policy.yaml <<'EOF'
+name: projects/project-f5db746b-2bc2-4fda-a87/policies/iam.disableServiceAccountKeyCreation
+spec:
+  rules:
+  - enforce: false
+EOF
+
+gcloud org-policies set-policy policy.yaml
+
+# create the key
+gcloud iam service-accounts keys create key.json \
+  --iam-account=my-storage-sa@project-f5db746b-2bc2-4fda-a87.iam.gserviceaccount.com
+
+# import into k8s
+kubectl create secret generic storage-sa-key --from-file=key.json=key.json
+
+# apply rentention policy
+gcloud storage buckets update gs://todo_bucket_1 --lifecycle-file=retention.json
