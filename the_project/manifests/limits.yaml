@@ -1,0 +1,40 @@
+# 4 e2-medium is 16 GB of usable RAM, if 30% is used by the OS we have about 5 GiB of usable RAM
+# so the namespace can never use more than about a fifth of the cluster’s memory (1Gi)
+
+# set defaults and bounds for individual containers
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-limits
+  namespace: ${NAMESPACE}
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        # if a container doesn’t declare a CPU request, it gets 50 millicores (5% of a core). The scheduler reserves this much for it
+        cpu: 50m
+        # if a container doesn’t declare a memory request, it gets 64Mi. The scheduler reserves this much for it
+        memory: 64Mi
+      default:
+        # if a container doesn’t declare a memory limit, it gets 256Mi. Exceeding it means the container is OOMKilled
+        memory: 256Mi
+      max:
+        # no container may set a memory limit above 1Gi. A pod that asks for more is rejected at creation
+        memory: 1Gi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: namespace-quota
+  namespace: ${NAMESPACE}
+spec:
+  hard:
+    # the sum of all CPU requests in the namespace can’t exceed half a core. It’s a scheduling budget, not a usage cap
+    requests.cpu: 500m
+    # the sum of all memory requests can’t exceed 500Mi. This is the amount the scheduler reserves
+    requests.memory: 500Mi
+    # the sum of all memory limits can’t exceed 2Gi. 
+    # This is the real protection, since it caps how much memory the namespace could ever use at once
+    limits.memory: 2Gi
+    # at most 10 pods exist in the namespace, including completed backup job pods that haven’t been cleaned up yet
+    pods: "5"
