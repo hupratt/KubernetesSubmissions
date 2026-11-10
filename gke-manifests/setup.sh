@@ -160,3 +160,6 @@ sudo mv kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
 
 # and run it
 kubectl argo rollouts get rollout flaky-update-dep -w
+
+# and rollback to working replicaset
+kubectl argo rollouts undo flaky-update-dep --to-revision=4
