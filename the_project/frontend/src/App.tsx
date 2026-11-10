@@ -4,9 +4,38 @@ const MAX_LENGTH = 140;
 
 type Todo = { id: number; text: string };
 
+function ErrorPage() {
+  const [checking, setChecking] = useState(false);
+
+  const retry = async () => {
+    setChecking(true);
+    try {
+      const r = await fetch("/healthz");
+      if (r.ok) {
+        window.location.reload();
+        return;
+      }
+    } catch {
+      // pod is restarting; fall through
+    }
+    setChecking(false);
+  };
+
+  return (
+    <main style={{ display: "grid", placeItems: "center", minHeight: "100vh" }}>
+      <h1>Something went wrong</h1>
+      <p>The app is unhealthy. Kubernetes should restart it shortly.</p>
+      <button onClick={retry} disabled={checking}>
+        {checking ? "Checking…" : "Try again"}
+      </button>
+    </main>
+  );
+}
+
 export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [broken, setBroken] = useState(false);
   const [todo, setTodo] = useState("");
   const [todos, setTodos] = useState<Todo[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +72,16 @@ export default function App() {
       setError("Could not create todo.");
     }
   };
+
+  const handleBreak = async () => {
+    try {
+      await fetch("/api/break", { method: "POST" });
+    } finally {
+      setBroken(true);
+    }
+  };
+
+  if (broken) return <ErrorPage />;
 
   return (
     <main style={{ display: "grid", placeItems: "center", minHeight: "100vh" }}>
@@ -88,6 +127,10 @@ export default function App() {
           <li key={t.id}>{t.text}</li>
         ))}
       </ul>
+
+      <button onClick={handleBreak} style={{ marginTop: "2rem" }}>
+        Break the app
+      </button>
 
       <h3>devops-with-kubernetes-2026</h3>
     </main>

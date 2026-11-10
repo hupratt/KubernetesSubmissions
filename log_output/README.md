@@ -72,13 +72,18 @@ gh release create 2.5 --target=main --notes "2.5. The project is complete"
 set up a test database locally
 
 ```bash
-docker run -d --name pingpong-db \
-  -e POSTGRES_USER=pingpong \
-  -e POSTGRES_PASSWORD=pingpong \
-  -e POSTGRES_DB=pingpong \
+
+docker volume create todos-pgdata-17
+docker run -d --name todos-db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=strongpw \
+  -e POSTGRES_DB=todos \
   -p 5432:5432 \
-  -v pingpong-pgdata:/var/lib/postgresql/data \
-  postgres:16-alpine
+  -v todos-pgdata-17:/var/lib/postgresql/data \
+  postgres:17-alpine
+DATABASE_URL="postgresql://postgres:strongpw@localhost:5432/todos"
+uv run fastapi run src/todo_app/main.py --host 0.0.0.0 --port 8000
+npm run dev
 
 docker build -t hupratt/log_output:2.7 .
 docker push hupratt/log_output:2.7
@@ -95,4 +100,21 @@ gcloud container clusters update dwk-cluster --location=europe-north1-b --gatewa
 gh release create 3.3 --target=main --notes "3.3. The project is complete"
 gh release create 3.4 --target=main --notes "3.4. The project is complete"
 
+```
+
+set up a test database locally with postgres 17
+
+```bash
+
+docker volume create todos-pgdata-17
+docker run -d --name todos-db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=strongpw \
+  -e POSTGRES_DB=todos \
+  -p 5432:5432 \
+  -v todos-pgdata-17:/var/lib/postgresql/data \
+  postgres:17-alpine
+export DATABASE_URL="postgresql://postgres:strongpw@localhost:5432/todos"
+uv run fastapi run src/todo_app/main.py --host 0.0.0.0 --port 8000
+npm run dev
 ```
