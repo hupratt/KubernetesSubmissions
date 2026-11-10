@@ -120,3 +120,27 @@ gh release create 3.10 --target=main --notes "3.10. The project is complete"
 gh release create 3.11 --target=main --notes "3.11. The project is complete"
 gh release create 3.12 --target=main --notes "3.12. The project is complete"
 gh release create 4.1 --target=main --notes "4.1. The project is complete"
+gh release create 4.2 --target=main --notes "4.2. The project is complete"
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+
+helm upgrade --install prom prometheus-community/prometheus \
+  --namespace monitoring \
+  --create-namespace \
+  --values prom-values.yaml
+
+helm upgrade --install loki grafana/loki \
+  --namespace monitoring \
+  --values loki-values.yaml
+
+helm upgrade --install k8smon grafana/k8s-monitoring \
+  --namespace monitoring \
+  --values k8smon-values.yaml
+
+helm upgrade --install grafana grafana/grafana \
+  --namespace monitoring \
+  --values grafana-values.yaml
+
+gh release create 4.3 --target=main --notes "4.3. The project is complete"

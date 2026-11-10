@@ -1,8 +1,20 @@
 # KubernetesSubmissions
 
-#### GKE logs
+#### Prometheus query
 
-![logs](./the_project/asset/swappy-20261109-225016.png)
+Write a query that shows the number of pods created by StatefulSets in prometheus namespace. For the above setup the Value should be 3 different pods
+
+```
+count(
+  kube_pod_owner{
+    namespace="monitoring",
+    owner_kind="StatefulSet"
+  }
+)
+```
+
+![logs](./the_project/asset/swappy-20261110-170005.png)
+
 
 ## Exercises
 
