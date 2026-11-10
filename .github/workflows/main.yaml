@@ -28,11 +28,13 @@ jobs:
             image: todo-app
             service: todo
             kustomize_image: PROJECT/IMAGE
+            main_namespace: project
           - name: pingpong
             dir: ./log_output
             image: log_output # image name
             service: logoutput # deployment name
             kustomize_image: PROJECT/IMAGE
+            main_namespace: exercises
     env:
       IMAGE: ${{ matrix.app.image }}
       SERVICE: ${{ matrix.app.service }}
@@ -71,11 +73,11 @@ jobs:
         run: docker push $IMAGE_TAG
 
       - name: Deploy
+        env:
+          MAIN_NAMESPACE: ${{ matrix.app.main_namespace }}
         run: |-
-          if [ "$GITHUB_REF_NAME" = "main" && ${{ matrix.app.service }} = "todo" ]; then
-            NAMESPACE=project
-          elif [ "$GITHUB_REF_NAME" = "main" && ${{ matrix.app.service }} = "logoutput" ]; then
-            NAMESPACE=exercises
+          if [ "$GITHUB_REF_NAME" = "main" ]; then
+            NAMESPACE=$MAIN_NAMESPACE
           else
             NAMESPACE=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | tr '/_' '--')
           fi
