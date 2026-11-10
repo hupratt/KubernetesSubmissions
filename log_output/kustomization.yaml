@@ -4,10 +4,8 @@ resources:
   - manifests/configmap.yaml
   - manifests/deployment.yaml
   - manifests/httproute.yaml
-  - manifests/ns.yaml
   - manifests/secret.yaml
   - manifests/service.yaml
-  - manifests/sts.yaml
 images:
   - name: PROJECT/IMAGE
     newName: hupratt/log_output
