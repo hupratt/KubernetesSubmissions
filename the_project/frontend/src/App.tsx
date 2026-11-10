@@ -2,7 +2,7 @@ import { useEffect, useState, type ChangeEvent } from "react";
 
 const MAX_LENGTH = 140;
 
-type Todo = { id: number; text: string };
+type Todo = { id: number; text: string; done: boolean };
 
 function ErrorPage() {
   const [checking, setChecking] = useState(false);
@@ -39,6 +39,7 @@ export default function App() {
   const [todo, setTodo] = useState("");
   const [todos, setTodos] = useState<Todo[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [updatingTodoId, setUpdatingTodoId] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/todos")
@@ -70,6 +71,31 @@ export default function App() {
       setError(null);
     } catch {
       setError("Could not create todo.");
+    }
+  };
+
+  const handleMarkDone = async (todo: Todo) => {
+    if (todo.done || updatingTodoId !== null) return;
+
+    setUpdatingTodoId(todo.id);
+    try {
+      const r = await fetch(`/todos/${todo.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ done: true }),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+
+      setTodos((prev) =>
+        prev.map((item) =>
+          item.id === todo.id ? { ...item, done: true } : item,
+        ),
+      );
+      setError(null);
+    } catch {
+      setError(`Could not mark todo ${todo.id} as done.`);
+    } finally {
+      setUpdatingTodoId(null);
     }
   };
 
@@ -122,9 +148,45 @@ export default function App() {
 
       {error && <p role="alert">{error}</p>}
 
-      <ul>
+      <h2>Todos</h2>
+      <ul style={{ listStyle: "none", padding: 0, width: "min(100%, 640px)" }}>
         {todos.map((t) => (
-          <li key={t.id}>{t.text}</li>
+          <li
+            key={t.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
+              padding: "0.8rem",
+              marginBottom: "0.5rem",
+              background: t.done ? "#f0f0f0" : "#fafafa",
+              borderLeft: `4px solid ${t.done ? "#999" : "#4caf50"}`,
+              borderRadius: "4px",
+            }}
+          >
+            <span
+              style={{
+                textDecoration: t.done ? "line-through" : "none",
+                color: t.done ? "#666" : "inherit",
+              }}
+            >
+              {t.text}
+            </span>
+            {t.done ? (
+              <strong style={{ color: "#218838", whiteSpace: "nowrap" }}>
+                Done
+              </strong>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleMarkDone(t)}
+                disabled={updatingTodoId !== null}
+              >
+                {updatingTodoId === t.id ? "Saving…" : "Mark done"}
+              </button>
+            )}
+          </li>
         ))}
       </ul>
 

@@ -36,8 +36,14 @@ def init_schema() -> None:
                 id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                 text       VARCHAR(140) NOT NULL
                            CHECK (char_length(text) BETWEEN 1 AND 140),
+                done       BOOLEAN NOT NULL DEFAULT FALSE,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT now()
             )
+            """
+        )
+        conn.execute(
+            """
+            ALTER TABLE todos ADD COLUMN IF NOT EXISTS done BOOLEAN NOT NULL DEFAULT FALSE;
             """
         )
         if conn.execute("SELECT 1 FROM todos LIMIT 1").fetchone() is None:
