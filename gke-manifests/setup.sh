@@ -167,3 +167,12 @@ kubectl argo rollouts undo flaky-update-dep --to-revision=4
 
 kubectl argo rollouts get rollout logoutput -n exercises -w
 gh release create 4.4 --target=main --notes "4.4. The project is complete"
+
+# and check out the analysis' report:
+
+kubectl get analysisruns -n exercises    
+NAME                       STATUS       AGE
+logoutput-5dfc4bb6fc-3-1   Successful   9m50s
+logoutput-84844b4bfc-2-1   Successful   13m
+logoutput-85fd88ddb9-4-1   Error        8m2s
+kubectl describe analysisruns logoutput-85fd88ddb9-4-1 -n exercises
