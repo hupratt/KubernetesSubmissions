@@ -10,4 +10,5 @@ resources:
   - manifests/sts.yaml
 images:
   - name: PROJECT/IMAGE
-    newName: hupratt/log_output:4.1
+    newName: hupratt/log_output
+    newTag: "4.1"
