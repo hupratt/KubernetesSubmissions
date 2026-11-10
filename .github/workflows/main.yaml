@@ -13,6 +13,8 @@ env:
 
 jobs:
   build-publish-deploy:
+    # prevent it from deploying to k8s if . in the branch name
+    if: ${{ !contains(github.ref_name, '.') }}
     name: Build, Publish and Deploy (${{ matrix.app.name }})
     runs-on: ubuntu-latest
     environment: GKE_PROJECT
