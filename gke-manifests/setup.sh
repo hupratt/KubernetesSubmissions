@@ -144,3 +144,19 @@ helm upgrade --install grafana grafana/grafana \
   --values grafana-values.yaml
 
 gh release create 4.3 --target=main --notes "4.3. The project is complete"
+
+kubectl create namespace argo-rollouts
+kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
+kubectl apply --server-side --force-conflicts -n argo-rollouts \
+  -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
+
+
+kubectl get pods -l app=flaky-update -o 'custom-columns=NAME:.metadata.name,IMAGES:.spec.containers[*].image' -w
+
+# or download the plugin
+curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
+chmod +x kubectl-argo-rollouts-linux-amd64
+sudo mv kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+
+# and run it
+kubectl argo rollouts get rollout flaky-update-dep -w
