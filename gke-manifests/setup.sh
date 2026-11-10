@@ -119,3 +119,4 @@ gh release create 3.10 --target=main --notes "3.10. The project is complete"
 
 gh release create 3.11 --target=main --notes "3.11. The project is complete"
 gh release create 3.12 --target=main --notes "3.12. The project is complete"
+gh release create 4.1 --target=main --notes "4.1. The project is complete"

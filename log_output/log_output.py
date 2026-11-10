@@ -19,7 +19,13 @@ def fetch_pongs():
             return r.read().decode().strip()
     except Exception:
         return "unavailable"
-
+    
+def pingpong_ok():
+    try:
+        with urllib.request.urlopen(PINGPONG_URL, timeout=2) as r:
+            return r.status == 200
+    except Exception:
+        return False
 
 def read_file(path, default=""):
     try:
@@ -51,7 +57,16 @@ def produce():
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path.split("?")[0].rstrip("/") != "":
+        path = self.path.split("?")[0].rstrip("/")
+        if path == "/healthz":
+            ok = pingpong_ok()
+            body = b"ok" if ok else b"pingpong unavailable"
+            self.send_response(200 if ok else 503)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if path != "":
             self.send_error(404)
             return
         body = (read_file(LOG_FILE) or "no entries yet").encode()

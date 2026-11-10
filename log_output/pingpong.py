@@ -69,6 +69,10 @@ class Handler(BaseHTTPRequestHandler):
                 self.respond(f"pong {increment()}")
             elif path == "/pings":
                 self.respond(str(read_counter()))
+            elif path == "/healthz":
+                with pool.connection(timeout=2) as conn:
+                    conn.execute("SELECT 1")
+                self.respond("ok")
             else:
                 self.send_error(404)
         except psycopg.Error as e:
