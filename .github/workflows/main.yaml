@@ -86,5 +86,5 @@ jobs:
           kustomize edit set namespace $NAMESPACE
           kustomize edit set image ${{ matrix.app.kustomize_image }}=$IMAGE_TAG
           kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment $SERVICE -n $NAMESPACE
+          kubectl argo rollouts get rollout $SERVICE -n $NAMESPACE
           kubectl get services -o wide
