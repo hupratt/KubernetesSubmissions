@@ -8,5 +8,4 @@ resources:
   - manifests/service.yaml
 images:
   - name: PROJECT/IMAGE
-    newName: hupratt/log_output
-    newTag: "4.1"
+    newName: my-docker-reg/log_output
