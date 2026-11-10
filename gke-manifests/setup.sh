@@ -163,3 +163,7 @@ kubectl argo rollouts get rollout flaky-update-dep -w
 
 # and rollback to working replicaset
 kubectl argo rollouts undo flaky-update-dep --to-revision=4
+
+
+kubectl argo rollouts get rollout logoutput -n exercises -w
+gh release create 4.4 --target=main --notes "4.4. The project is complete"
