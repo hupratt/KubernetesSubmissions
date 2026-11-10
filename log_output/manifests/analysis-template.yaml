@@ -10,7 +10,7 @@ spec:
       initialDelay: 1m
       interval: 30s
       count: 10
-      successCondition: len(result) > 0 && result[0] < 0.5
+      successCondition: len(result) > 0 && result[0] < 0.01
       failureLimit: 0
       provider:
         prometheus:
