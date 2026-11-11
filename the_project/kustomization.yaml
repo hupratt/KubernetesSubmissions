@@ -11,6 +11,7 @@ resources:
 - manifests/service.yaml
 - manifests/broadcaster.yaml
 - manifests/gateway.yaml
+- manifests/analysis-template.yaml
 images:
 - name: PROJECT/IMAGE
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/todo-app
