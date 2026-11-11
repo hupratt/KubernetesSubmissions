@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: logoutput-staging
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hupratt/KubernetesSubmissions
+    path: log_output/overlays/staging
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
