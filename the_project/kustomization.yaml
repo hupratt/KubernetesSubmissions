@@ -12,6 +12,7 @@ resources:
 - manifests/service.yaml
 - manifests/gateway.yaml
 - manifests/analysis-template-restart-rate.yaml
+- manifests/analysis-template-cpu-usage.yaml
 images:
 - name: PROJECT/IMAGE
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/todo-app
