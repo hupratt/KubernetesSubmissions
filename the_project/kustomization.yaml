@@ -5,7 +5,8 @@ resources:
 - manifests/cm.yaml
 - manifests/cron_backup.yaml
 - manifests/cron_wikipedia.yaml
-- manifests/argo-rollout.yaml
+- manifests/argo-rollout-broadcast.yaml
+- manifests/argo-rollout-todoapp.yaml
 - manifests/httproute.yaml
 - manifests/secret.yaml
 - manifests/service.yaml
