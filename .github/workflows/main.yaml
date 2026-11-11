@@ -12,14 +12,14 @@ env:
   BRANCH: ${{ github.ref_name }}
 
 jobs:
-  build-publish-deploy:
-    # prevent it from deploying to k8s if . in the branch name
+  build-publish:
+    # prevent it from running if . in the branch name
     if: ${{ !contains(github.ref_name, '.') }}
-    name: Build, Publish and Deploy (${{ matrix.app.name }})
+    name: Build and Publish (${{ matrix.app.name }})
     runs-on: ubuntu-latest
     environment: GKE_PROJECT
     permissions:
-      contents: read
+      contents: write
       id-token: write
     strategy:
       fail-fast: false
@@ -28,18 +28,14 @@ jobs:
           - name: todo
             dir: ./the_project
             image: todo-app
-            service: todo
-            kustomize_image: PROJECT/IMAGE
             main_namespace: project
+
           - name: pingpong
             dir: ./log_output
-            image: log_output # image name
-            service: logoutput # deployment name
-            kustomize_image: PROJECT/IMAGE
+            image: log_output
             main_namespace: exercises
     env:
       IMAGE: ${{ matrix.app.image }}
-      SERVICE: ${{ matrix.app.service }}
     defaults:
       run:
         working-directory: ${{ matrix.app.dir }}
@@ -55,13 +51,6 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v3
 
-      - name: Get GKE credentials
-        uses: google-github-actions/get-gke-credentials@v3
-        with:
-          cluster_name: ${{ env.GKE_CLUSTER }}
-          project_id: ${{ env.PROJECT_ID }}
-          location: ${{ env.GKE_ZONE }}
-
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker "$REGISTRY"
 
@@ -74,18 +63,16 @@ jobs:
       - name: Publish
         run: docker push $IMAGE_TAG
 
-      - name: Deploy
-        env:
-          MAIN_NAMESPACE: ${{ matrix.app.main_namespace }}
-        run: |-
-          if [ "$GITHUB_REF_NAME" = "main" ]; then
-            NAMESPACE=$MAIN_NAMESPACE
-          else
-            NAMESPACE=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | tr '/_' '--')
-          fi
-          kubectl create namespace $NAMESPACE || true
-          kubectl config set-context --current --namespace=$NAMESPACE
-          kustomize edit set namespace $NAMESPACE
-          kustomize edit set image ${{ matrix.app.kustomize_image }}=$IMAGE_TAG
-          kustomize build . | kubectl apply -f -
-          kubectl get services -o wide
+      - name: Update image in kustomization
+        run: kustomize edit set image PROJECT/IMAGE=$IMAGE_TAG
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add kustomization.yaml
+          git commit -m "Update ${{ matrix.app.name }} image to $IMAGE_TAG [skip ci]"
+          for i in 1 2 3; do
+            git pull --rebase && git push && break
+            sleep 3
+          done
