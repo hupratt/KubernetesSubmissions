@@ -12,7 +12,7 @@ env:
   TAG: ${{ github.ref_name }}-${{ github.sha }}
 
 jobs:
-  build-publish:
+  build-pub:
     name: Build and Publish (${{ matrix.app.name }})
     runs-on: ubuntu-latest
     environment: GKE_PROJECT
@@ -48,7 +48,7 @@ jobs:
 
   update-manifests:
     name: Update ${{ startsWith(github.ref, 'refs/tags/') && 'prod' || 'staging' }} manifests
-    needs: build-publish
+    needs: build-pub
     runs-on: ubuntu-latest
     environment: GKE_PROJECT
     permissions:
