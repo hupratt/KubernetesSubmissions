@@ -6,7 +6,7 @@ gcloud -v
 gcloud auth login
 gcloud config set project project-f5db746b-2bc2-4fda-a87 
 gcloud config list project
-gcloud container clusters create dwk-cluster --zone=europe-north1-b --cluster-version=1.37 --disk-size=32 --num-nodes=4 --machine-type=e2-medium --gateway-api=standard
+gcloud container clusters create dwk-cluster --zone=europe-north1-b --cluster-version=1.37 --disk-size=32 --num-nodes=4 --machine-type=e2-standard-2 --gateway-api=standard
 
 gh release create 3.1 --target=main --notes "3.1. The project is complete"
 gh release create 3.5 --target=main --notes "3.5. The project is complete"
@@ -178,3 +178,18 @@ logoutput-85fd88ddb9-4-1   Error        8m2s
 kubectl describe analysisruns logoutput-85fd88ddb9-4-1 -n exercises
 
 gh release create 4.5 --target=main --notes "4.5. The project is complete"
+
+gcloud container node-pools update default-pool \
+  --cluster=dwk-cluster \
+  --location=europe-north1-b \
+  --machine-type=e2-medium
+
+
+helm repo add nats https://nats-io.github.io/k8s/helm/charts/
+helm repo update
+helm upgrade --install my-nats nats/nats \
+  --namespace nats \
+  --create-namespace \
+  --set promExporter.enabled=true
+
+gh release create 4.6 --target=main --notes "4.6. The project is complete"
