@@ -146,7 +146,9 @@ helm upgrade --install grafana grafana/grafana \
 gh release create 4.3 --target=main --notes "4.3. The project is complete"
 
 kubectl create namespace argo-rollouts
+# this will error out because of some *** annotation
 kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
+# this one won't
 kubectl apply --server-side --force-conflicts -n argo-rollouts \
   -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
 

@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import db, image, todos
+from . import db, events, image, todos
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,8 +24,10 @@ async def lifespan(app: FastAPI):
     db.pool.open(wait=True, timeout=30)
     db.init_schema()
     image.load_from_disk()
+    await events.connect()
     logger.info("Server started on port %s", PORT)
     yield
+    await events.close()
     db.pool.close()
 
 

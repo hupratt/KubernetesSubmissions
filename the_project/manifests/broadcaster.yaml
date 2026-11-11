@@ -30,5 +30,10 @@ spec:
             requests: { cpu: 10m, memory: 32Mi }
             limits: { memory: 128Mi }
 ---
-# Create the secret without committing the URL:
-#   kubectl create secret generic discord-webhook --from-literal=url='https://discord.com/api/webhooks/...'
+# Create the secret
+# right click on a channel>integrations> create webhook
+
+# kubectl create secret generic discord-webhook -n project \
+#   --from-literal=url='https://discord.com/api/webhooks/<id>/<token>'
+
+
