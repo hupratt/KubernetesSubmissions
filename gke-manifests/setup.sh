@@ -209,3 +209,5 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 
 gh release create 4.7 --target=main --notes "4.7. The project is complete"
 gh release create 4.8 --target=main --notes "4.8. The project is complete"
+
+gh release create 4.9 --target=main --notes "4.9. The project is complete"

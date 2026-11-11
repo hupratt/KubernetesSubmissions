@@ -2,6 +2,8 @@ name: Release application
 
 on:
   push:
+    branches: [main]      # staging
+    tags: ['v*']          # production
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -13,8 +15,6 @@ env:
 
 jobs:
   build-publish:
-    # prevent it from running if . in the branch name
-    if: ${{ !contains(github.ref_name, '.') }}
     name: Build and Publish (${{ matrix.app.name }})
     runs-on: ubuntu-latest
     environment: GKE_PROJECT
