@@ -7,7 +7,6 @@ spec:
     - name: namespace
   metrics:
     - name: namespace-cpu-usage
-      namespace: default
       initialDelay: 1m
       interval: 30s
       count: 10
