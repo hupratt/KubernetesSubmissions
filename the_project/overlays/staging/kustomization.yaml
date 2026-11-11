@@ -5,5 +5,8 @@ namespace: staging
 
 resources:
 - ./../../base
-
 namePrefix: staging-
+images:
+- name: todo-app
+  newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/todo-app
+  newTag: main-6400ed8dba05457120ed7d7d1637e76e321d132a
