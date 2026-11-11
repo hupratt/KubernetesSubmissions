@@ -8,7 +8,7 @@ configurations:
 
 resources:
 - ./../../base
-namePrefix: staging-
+# namePrefix: staging-
 
 patches:
 - patch: |-
