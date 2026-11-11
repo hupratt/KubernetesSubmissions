@@ -13,6 +13,6 @@ spec:
         address: http://prom-prometheus-server.monitoring.svc.cluster.local:80
         query: |
           scalar(
-            sum(kube_pod_container_status_restarts_total{namespace="default", container="flaky-update"}) -
-            sum(kube_pod_container_status_restarts_total{namespace="default", container="flaky-update"} offset 2m)
+            sum(kube_pod_container_status_restarts_total{namespace="project", container="todo"}) -
+            sum(kube_pod_container_status_restarts_total{namespace="project", container="todo"} offset 2m)
           )

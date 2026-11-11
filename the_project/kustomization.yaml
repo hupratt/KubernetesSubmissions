@@ -9,7 +9,6 @@ resources:
 - manifests/httproute.yaml
 - manifests/secret.yaml
 - manifests/service.yaml
-- manifests/broadcaster.yaml
 - manifests/gateway.yaml
 - manifests/analysis-template.yaml
 images:
