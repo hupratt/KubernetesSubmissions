@@ -50,27 +50,32 @@ jobs:
     name: Update ${{ startsWith(github.ref, 'refs/tags/') && 'prod' || 'staging' }} manifests
     needs: build-publish
     runs-on: ubuntu-latest
-    environment: GKE_PROJECT          # needed to read secrets.GKE_PROJECT
+    environment: GKE_PROJECT
     permissions:
       contents: write
     env:
       OVERLAY: ${{ startsWith(github.ref, 'refs/tags/') && 'prod' || 'staging' }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: main
 
-      - name: Set images in overlay
-        working-directory: overlays/${{ env.OVERLAY }}
+      - name: Set images in overlays
         run: |
           PREFIX="$REGISTRY/$PROJECT_ID/$REPOSITORY"
-          kustomize edit set image \
-            todo-app="$PREFIX/todo-app:$TAG" \
-            log_output="$PREFIX/log_output:$TAG"
+
+          (cd the_project/overlays/$OVERLAY && \
+            kustomize edit set image todo-app="$PREFIX/todo-app:$TAG")
+
+          (cd log_output/overlays/$OVERLAY && \
+            kustomize edit set image log_output="$PREFIX/log_output:$TAG")
 
       - name: Commit and push
         run: |
           git config user.name  "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add overlays/$OVERLAY/kustomization.yaml
+          git add the_project/overlays/$OVERLAY/kustomization.yaml \
+                  log_output/overlays/$OVERLAY/kustomization.yaml
           git commit -m "Update $OVERLAY images to $TAG [skip ci]"
           for i in 1 2 3; do
             git pull --rebase origin main && git push origin HEAD:main && break
