@@ -14,4 +14,4 @@ resources:
 images:
 - name: PROJECT/IMAGE
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/todo-app
-  newTag: main-26df566fbe0426f7ca75fc2a7db0e37edb398258
+  newTag: main-3d625b6dddee8915aa98820c36564959afd68408
