@@ -1,4 +1,4 @@
-name: Release application
+name: Build and push to github
 
 on:
   push:
