@@ -9,4 +9,3 @@ resources:
   - manifests/service.yaml
 images:
   - name: PROJECT/IMAGE
-    newName: my-docker-reg/log_output
