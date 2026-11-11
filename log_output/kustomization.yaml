@@ -1,11 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - manifests/analysis-template.yaml
-  - manifests/configmap.yaml
-  - manifests/argo-rollout.yaml
-  - manifests/httproute.yaml
-  - manifests/secret.yaml
-  - manifests/service.yaml
+- manifests/analysis-template.yaml
+- manifests/configmap.yaml
+- manifests/argo-rollout.yaml
+- manifests/httproute.yaml
+- manifests/secret.yaml
+- manifests/service.yaml
 images:
-  - name: PROJECT/IMAGE
+- name: PROJECT/IMAGE
+  newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/log_output
+  newTag: main-a042dfce3e0d4003958b14686088e87726a513b4
