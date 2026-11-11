@@ -9,6 +9,16 @@ configurations:
 resources:
 - ./../../base
 namePrefix: staging-
+
+patches:
+  - target:
+      kind: Secret
+      name: todoapp-secret   # original name, before the prefix
+    patch: |-
+      - op: replace
+        path: /stringData/DATABASE_URL
+        value: "postgresql://postgres:strongpw@staging-postgres-headless.staging.svc.cluster.local:5432/todos"
+
 images:
 - name: todo-app
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/todo-app
