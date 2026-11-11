@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: restart-rate
+spec:
+  args:
+    - name: namespace
+    - name: container
+      value: todo
+  metrics:
+    - name: restart-rate
+      initialDelay: 2m
+      successCondition: result < 2
+      provider:
+        prometheus:
+          address: http://prom-prometheus-server.monitoring.svc.cluster.local:80
+          query: |
+            scalar(
+              sum(kube_pod_container_status_restarts_total{namespace="{{args.namespace}}", container="{{args.container}}"}) -
+              sum(kube_pod_container_status_restarts_total{namespace="{{args.namespace}}", container="{{args.container}}"} offset 2m)
+            )

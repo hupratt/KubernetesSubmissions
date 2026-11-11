@@ -13,7 +13,16 @@ spec:
       - setWeight: 50
       - analysis:
           templates:
+          - templateName: cpu-usage
           - templateName: restart-rate
+            # pass the namespace from the Rollout’s own metadata, so it always follows whatever kustomize sets
+            args:
+              - name: namespace
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
+              - name: container
+                value: todo
   template:
     metadata:
       labels:

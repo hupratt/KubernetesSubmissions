@@ -11,10 +11,16 @@ spec:
   strategy:
     canary:
       steps:
-      - setWeight: 50
-      - analysis:
-          templates:
-          - templateName: cpu-usage
+        - setWeight: 50
+        - analysis:
+            templates:
+              - templateName: cpu-usage
+              - templateName: restart-rate
+            args:
+              - name: namespace
+                value: exercise
+              - name: container
+                value: logoutput-expose
   template:
     metadata:
       labels:

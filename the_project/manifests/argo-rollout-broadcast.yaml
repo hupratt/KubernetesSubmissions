@@ -7,6 +7,13 @@ spec:
   selector:
     matchLabels:
       app: broadcaster
+  strategy:
+    canary:
+      steps:
+        - setWeight: 25
+        - pause: { duration: 30s }
+        - setWeight: 50
+        - pause: { duration: 30s }
   template:
     metadata:
       labels:
@@ -14,9 +21,9 @@ spec:
     spec:
       containers:
         - name: broadcaster
-          command: ["/todo-app/.venv/bin/python", "/todo-app/src/todo_app/broadcaster.py"]
           image: PROJECT/IMAGE
           imagePullPolicy: Always
+          command: ["/todo-app/.venv/bin/python", "/todo-app/src/todo_app/broadcaster.py"]
           env:
             - name: NATS_URL
               value: nats://my-nats-0.my-nats-headless.nats.svc.cluster.local:4222
