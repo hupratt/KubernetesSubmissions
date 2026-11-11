@@ -9,4 +9,4 @@ namePrefix: staging-
 images:
 - name: todo-app
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/todo-app
-  newTag: main-cbac446cddb91b34b31e3f85a4b29c0db35fdc87
+  newTag: main-c11e62e65bf9e4a688ffb11942e8acdf24d6e718
