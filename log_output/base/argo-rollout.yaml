@@ -17,8 +17,6 @@ spec:
               - templateName: cpu-usage
               - templateName: restart-rate
             args:
-              - name: namespace
-                value: exercises
               - name: container
                 value: logoutput-expose
   template:

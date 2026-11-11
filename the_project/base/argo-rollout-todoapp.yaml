@@ -17,8 +17,6 @@ spec:
           - templateName: restart-rate
             # pass the namespace from the Rollout’s own metadata, so it always follows whatever kustomize sets
           args:
-            - name: namespace
-              value: project
             - name: container
               value: todo
   template:
