@@ -4,8 +4,7 @@ metadata:
   name: todo-route
 spec:
   parentRefs:
-  - name: my-gateway
-    namespace: default
+  - name: todo-gateway
   rules:
     - matches:
         - path:

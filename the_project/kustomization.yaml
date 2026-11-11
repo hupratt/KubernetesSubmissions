@@ -5,11 +5,12 @@ resources:
 - manifests/cm.yaml
 - manifests/cron_backup.yaml
 - manifests/cron_wikipedia.yaml
-- manifests/deployment.yaml
+- manifests/argo-rollout.yaml
 - manifests/httproute.yaml
 - manifests/secret.yaml
 - manifests/service.yaml
 - manifests/broadcaster.yaml
+- manifests/gateway.yaml
 images:
 - name: PROJECT/IMAGE
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/todo-app

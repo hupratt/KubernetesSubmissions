@@ -5,8 +5,8 @@ metadata:
   namespace: exercises
 spec:
   parentRefs:
-    - name: my-gateway
-      namespace: default
+    - name: pingpong-gateway
+      namespace: exercises
   rules:
     - matches:
         - path:
