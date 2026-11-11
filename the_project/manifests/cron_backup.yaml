@@ -2,7 +2,6 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: todo-db-backup
-  namespace: ${NAMESPACE}
 spec:
   schedule: "0 3 * * *"
   concurrencyPolicy: Forbid

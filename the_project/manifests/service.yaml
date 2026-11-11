@@ -2,7 +2,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: todo-svc
-  namespace: ${NAMESPACE}
 spec:
   type: ClusterIP
   selector:
