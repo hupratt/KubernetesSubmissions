@@ -195,3 +195,16 @@ helm upgrade --install my-nats nats/nats \
   --set promExporter.enabled=true
 
 gh release create 4.6 --target=main --notes "4.6. The project is complete"
+
+kubectl create namespace argocd
+kubectl apply -n argocd --server-side --force-conflicts \
+  -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+kubectl patch configmap argocd-cmd-params-cm -n argocd \
+  --type merge -p '{"data":{"server.insecure":"true"}}'
+kubectl rollout restart deployment argocd-server -n argocd
+
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath="{.data.password}" | base64 -d; echo
+
+gh release create 4.7 --target=main --notes "4.7. The project is complete"

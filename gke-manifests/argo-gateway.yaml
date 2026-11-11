@@ -1,0 +1,45 @@
+# argocd-gateway.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: argocd-gateway
+  namespace: argocd
+spec:
+  gatewayClassName: gke-l7-global-external-managed
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  parentRefs:
+    - name: argocd-gateway
+  rules:
+    - backendRefs:
+        - name: argocd-server
+          port: 80
+---
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: argocd-hc
+  namespace: argocd
+spec:
+  default:
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: 8080
+        requestPath: /healthz
+  targetRef:
+    group: ""
+    kind: Service
+    name: argocd-server
