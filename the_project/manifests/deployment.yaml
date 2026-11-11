@@ -29,6 +29,10 @@ spec:
                 secretKeyRef:
                   name: todoapp-secret
                   key: DATABASE_URL
+            - name: NATS_URL
+              value: nats://my-nats-0.my-nats-headless.nats.svc.cluster.local:4222
+            - name: NATS_SUBJECT
+              value: todos.events
           ports:
             - name: http
               containerPort: 9001

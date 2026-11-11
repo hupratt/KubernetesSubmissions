@@ -1,9 +1,9 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
-from . import db
+from . import db, events
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def list_todos():
 
 
 @router.post("", status_code=201)
-def create_todo(payload: TodoIn):
+def create_todo(payload: TodoIn, background_tasks: BackgroundTasks):
     # Log every incoming todo request text along with its character count
     logger.info("Received todo request (%d chars): %r", len(payload.text), payload.text)
 
@@ -42,11 +42,15 @@ def create_todo(payload: TodoIn):
             (payload.text,),
         ).fetchone()
     logger.info("Created todo %s", todo["id"])
+
+    # Runs after the response is sent, on the event loop, and only after the
+    # DB transaction above has committed.
+    background_tasks.add_task(events.publish, "created", todo)
     return todo
 
 
 @router.put("/{todo_id}")
-def update_todo(todo_id: int, payload: TodoUpdate):
+def update_todo(todo_id: int, payload: TodoUpdate, background_tasks: BackgroundTasks):
     with db.pool.connection() as conn:
         existing = conn.execute(
             "SELECT id, text, done FROM todos WHERE id = %s", (todo_id,)
@@ -62,4 +66,6 @@ def update_todo(todo_id: int, payload: TodoUpdate):
             (new_text, new_done, todo_id),
         ).fetchone()
     logger.info("Updated todo %s", todo_id)
+
+    background_tasks.add_task(events.publish, "updated", updated)
     return updated
