@@ -5,3 +5,9 @@ nameReference:
   - kind: Rollout
     group: argoproj.io
     path: spec/strategy/canary/steps/analysis/templates/templateName
+- kind: Secret
+  version: v1
+  fieldSpecs:
+  - kind: Rollout
+    group: argoproj.io
+    path: spec/template/spec/containers/env/valueFrom/secretKeyRef/name
