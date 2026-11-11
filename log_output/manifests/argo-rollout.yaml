@@ -18,7 +18,7 @@ spec:
               - templateName: restart-rate
             args:
               - name: namespace
-                value: exercise
+                value: exercises
               - name: container
                 value: logoutput-expose
   template:
