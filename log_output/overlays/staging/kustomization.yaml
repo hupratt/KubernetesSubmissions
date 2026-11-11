@@ -11,4 +11,4 @@ namePrefix: staging-
 images:
 - name: log_output
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/log_output
-  newTag: main-5bb09292b919aa75c1e8b4ed63e7fe82f37a02c5
+  newTag: main-512d3a8b29a6ce5a547472d3d8db4cc26cfdf550
