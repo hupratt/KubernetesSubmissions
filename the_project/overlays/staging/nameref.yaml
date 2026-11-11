@@ -1,0 +1,7 @@
+nameReference:
+- kind: AnalysisTemplate
+  group: argoproj.io
+  fieldSpecs:
+  - kind: Rollout
+    group: argoproj.io
+    path: spec/strategy/canary/steps/analysis/templates/templateName

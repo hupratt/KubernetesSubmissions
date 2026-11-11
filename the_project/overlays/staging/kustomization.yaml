@@ -3,6 +3,9 @@ kind: Kustomization
 
 namespace: staging
 
+configurations:
+- nameref.yaml
+
 resources:
 - ./../../base
 namePrefix: staging-
