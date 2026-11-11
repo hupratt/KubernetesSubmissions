@@ -14,7 +14,7 @@ spec:
       - setWeight: 50
       - analysis:
           templates:
-          - templateName: restart-rate
+          - templateName: cpu-usage
   template:
     metadata:
       labels:
