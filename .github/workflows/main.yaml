@@ -66,11 +66,16 @@ jobs:
 
           set_image() {
             dir="$1"; image="$2"
-            cd "$dir"
-            kustomize edit set image "PROJECT/IMAGE=$PREFIX/$image:$TAG"
-            kustomize build . | grep -q "image: $PREFIX/$image:$TAG" \
-              || { echo "Tag not found in rendered output"; kustomize build . | grep -n "image:"; exit 1; }
-            cd - >/dev/null
+            (
+              cd "$dir"
+              kustomize edit set image "PROJECT/IMAGE=$PREFIX/$image:$TAG"
+              rendered="$(kustomize build .)"
+              if ! grep -qF "image: $PREFIX/$image:$TAG" <<< "$rendered"; then
+                echo "Tag not found in rendered output"
+                grep -n "image:" <<< "$rendered"
+                exit 1
+              fi
+            )
           }
 
           set_image the_project/overlays/$OVERLAY todo-app
