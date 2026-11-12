@@ -213,10 +213,10 @@ gh release create 4.8 --target=main --notes "4.8. The project is complete"
 git commit --allow-empty -m "Kickstart staging queue" && git push
 
 git add -A
-git commit -m "v1.4 Kickstart prod queue"
-git tag -a v1.4 -m "Release v1.4"
+git commit -m "just a message"
+git tag -a v1.5 -m "Release v1.5"
 git push origin main
-git push origin refs/tags/v1.4
+git push origin refs/tags/v1.5
 
 export DATABASE_URL="postgresql://postgres:strongpw@localhost:5432/todos"
 export NATS_ENABLED=False
@@ -224,3 +224,4 @@ export DISCORD_ENABLED=False
 uv run fastapi run src/todo_app/main.py --host 0.0.0.0 --port 8000
 
 gh release create 4.9 --target=main --notes "4.9. The project is complete"
+gh release create 4.10 --target=main --notes "4.10. The project is complete"
