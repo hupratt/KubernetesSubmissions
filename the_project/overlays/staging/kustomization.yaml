@@ -5,7 +5,40 @@ namespace: staging
 
 resources:
 - ./../../base
+
 images:
 - name: PROJECT/IMAGE
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/todo-app
   newTag: main-7265fe86c5f918b181ad82bcd45a38407ad5da94
+
+patches:
+  # broadcaster: don't connect to NATS or Discord
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: Rollout
+      name: broadcaster
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: DISCORD_ENABLED
+          value: "false"
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: NATS_ENABLED
+          value: "false"
+
+  # Publisher: don't connect to NATS
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: Rollout
+      name: todo
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: NATS_ENABLED
+          value: "false"

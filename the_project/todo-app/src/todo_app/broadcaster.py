@@ -29,6 +29,7 @@ def env_bool(name: str, default: bool = True) -> bool:
     return val.strip().lower() in ("1", "true", "yes", "on")
 
 DISCORD_ENABLED = env_bool("DISCORD_ENABLED", True)
+NATS_ENABLED = env_bool("NATS_ENABLED", True)
 # Only required when we actually send to Discord.
 DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"] if DISCORD_ENABLED else ""
 
@@ -75,11 +76,18 @@ async def send_to_discord(client: httpx.AsyncClient, body: dict) -> None:
 
 
 async def main() -> None:
+    logger.info("NATS_ENABLED=%r -> %s", os.getenv("NATS_ENABLED"), NATS_ENABLED)
+    logger.info("DISCORD_ENABLED=%r -> %s", os.getenv("DISCORD_ENABLED"), DISCORD_ENABLED)
     stop = asyncio.Event()
     loop = asyncio.get_running_loop()
     for sig in (signal.SIGINT, signal.SIGTERM):
         loop.add_signal_handler(sig, stop.set)
-
+        
+    if not NATS_ENABLED:
+        logger.warning(f"NATS_ENABLED is {os.getenv("NATS_ENABLED")} and DISCORD_ENABLED is {os.getenv("DISCORD_ENABLED")}: not connecting, idling until shutdown")
+        await stop.wait()
+        return
+    
     async with httpx.AsyncClient(timeout=10) as http:
 
         async def handler(msg) -> None:
