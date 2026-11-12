@@ -18,11 +18,19 @@ NATS_SUBJECT = os.getenv("NATS_SUBJECT", "todos.events")
 # Queue group: with several replicas, each message is delivered to only ONE of
 # them, so Discord doesn't get duplicates.
 QUEUE_GROUP = os.getenv("NATS_QUEUE", "broadcaster")
-DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]  # required; from a Secret
 
 COLORS = {"created": 0x2ECC71, "updated": 0x3498DB}  # green / blue
 MAX_RETRIES = 3
 
+def env_bool(name: str, default: bool = True) -> bool:
+    val = os.getenv(name)
+    if val is None:
+        return default
+    return val.strip().lower() in ("1", "true", "yes", "on")
+
+DISCORD_ENABLED = env_bool("DISCORD_ENABLED", True)
+# Only required when we actually send to Discord.
+DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"] if DISCORD_ENABLED else ""
 
 def to_discord(event: dict) -> dict:
     """Translate our event into Discord's webhook format (an embed)."""
@@ -81,6 +89,12 @@ async def main() -> None:
             except (ValueError, KeyError, TypeError) as exc:
                 logger.warning("Ignoring malformed message %r: %s", msg.data[:200], exc)
                 return
+
+            if not DISCORD_ENABLED:
+                logger.info("Discord disabled, skipping %s event for todo %s",
+                            event["event"], event["todo"]["id"])
+                return
+
             logger.info("Forwarding %s event for todo %s", event["event"], event["todo"]["id"])
             await send_to_discord(http, body)
 
