@@ -210,4 +210,13 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 gh release create 4.7 --target=main --notes "4.7. The project is complete"
 gh release create 4.8 --target=main --notes "4.8. The project is complete"
 
+git commit --allow-empty -m "Kickstart staging queue" && git push
+
+git add -A
+git commit -m "v1.4 Kickstart prod queue"
+git tag -a v1.4 -m "Release v1.4"
+git push origin main
+git push origin refs/tags/v1.4
+
+
 gh release create 4.9 --target=main --notes "4.9. The project is complete"
