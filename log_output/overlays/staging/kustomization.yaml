@@ -8,4 +8,4 @@ resources:
 images:
 - name: PROJECT/IMAGE
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/log_output
-  newTag: main-7a6ca043a7f8530b8fea86a21fa6d8263e1fef25
+  newTag: main-0031b4b4d107378cd27924c61d19875633fb9ca8
