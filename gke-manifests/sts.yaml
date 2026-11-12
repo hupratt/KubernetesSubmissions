@@ -4,6 +4,16 @@ kind: Namespace
 metadata:
   name: postgres
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-auth
+  namespace: postgres
+type: Opaque
+stringData:
+  POSTGRES_USER: "postgres"
+  POSTGRES_PASSWORD: "strongpw"
+---
 # headless Service is used to give each StatefulSet Pod 
 # its own stable DNS record, rather than hiding all Pods 
 # behind a single virtual IP.

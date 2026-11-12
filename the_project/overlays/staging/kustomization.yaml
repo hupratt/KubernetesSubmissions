@@ -3,21 +3,8 @@ kind: Kustomization
 
 namespace: staging
 
-# configurations:
-# - nameref.yaml
-
 resources:
 - ./../../base
-# namePrefix: staging-
-
-# patches:
-# - patch: |-
-#     - op: replace
-#       path: /stringData/DATABASE_URL
-#       value: "postgresql://postgres:strongpw@staging-postgres-headless.staging.svc.cluster.local:5432/todos"
-#   target:
-#     kind: Secret
-#     name: todoapp-secret
 
 images:
 - name: todo-app
