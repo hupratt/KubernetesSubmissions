@@ -3,7 +3,6 @@ kind: Kustomization
 namespace: project
 resources:
 - cm.yaml
-- cron_backup.yaml
 - cron_wikipedia.yaml
 - argo-rollout-broadcast.yaml
 - argo-rollout-todoapp.yaml

@@ -25,7 +25,7 @@ spec:
 
               env:
                 - name: TODO_API_URL
-                  value: "http://todo-svc.project.svc.cluster.local:2345"
+                  value: "http://todo-svc:2345"
 
               volumeMounts:
                 - name: script
