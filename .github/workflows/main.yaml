@@ -91,7 +91,7 @@ jobs:
           git add the_project/overlays/$OVERLAY/kustomization.yaml \
                   log_output/overlays/$OVERLAY/kustomization.yaml
           git diff --cached --quiet && { echo "No changes"; exit 0; }
-          git commit -m "Update $OVERLAY images to $TAG [skip ci]"
+          git commit -m "Update $OVERLAY images to $TAG"
           for i in 1 2 3; do
             git pull --rebase origin main && git push origin HEAD:main && break
             sleep 3
