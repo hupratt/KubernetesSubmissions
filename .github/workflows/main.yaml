@@ -64,16 +64,25 @@ jobs:
         run: |
           PREFIX="$REGISTRY/$PROJECT_ID/$REPOSITORY"
 
-          # left side = image string exactly as written in the rollout manifest
-          (cd the_project/overlays/$OVERLAY && \
-            kustomize edit set image PROJECT/IMAGE="$PREFIX/todo-app:$TAG")
+          set_image() {
+            dir="$1"; image="$2"
+            cd "$dir"
+            # name the base leaves in the rendered output: full path if the base
+            # rewrites it, otherwise the raw placeholder
+            if kustomize build . | grep -q "image: $PREFIX/$image"; then
+              NAME="$PREFIX/$image"
+            else
+              NAME="PROJECT/IMAGE"
+            fi
+            echo "Matching image name: $NAME"
+            kustomize edit set image "$NAME=$PREFIX/$image:$TAG"
+            kustomize build . | grep -q "image: $PREFIX/$image:$TAG" \
+              || { echo "Tag not found in rendered output"; kustomize build . | grep -n "image:"; exit 1; }
+            cd - >/dev/null
+          }
 
-          (cd log_output/overlays/$OVERLAY && \
-            kustomize edit set image PROJECT/IMAGE="$PREFIX/log_output:$TAG")
-
-          # fail loudly if the tag didn't land in the rendered output
-          kustomize build the_project/overlays/$OVERLAY | grep -q "todo-app:$TAG"
-          kustomize build log_output/overlays/$OVERLAY  | grep -q "log_output:$TAG"
+          set_image the_project/overlays/$OVERLAY todo-app
+          set_image log_output/overlays/$OVERLAY log_output
 
       - name: Commit and push
         run: |
