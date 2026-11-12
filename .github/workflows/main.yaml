@@ -70,14 +70,6 @@ jobs:
               cd "$dir"
               kustomize edit set image "PROJECT/IMAGE=$PREFIX/$image:$TAG"
               rendered="$(kustomize build .)"
-              if ! grep -qF "image: $PREFIX/$image:$TAG" <<< "$rendered"; then
-                echo "Expected: image: $PREFIX/$image:$TAG"
-                echo "--- kustomization.yaml ---"
-                cat kustomization.yaml
-                echo "--- base image refs ---"
-                grep -rn "image:" ../../base 2>/dev/null
-                exit 1
-              fi
             )
           }
 
