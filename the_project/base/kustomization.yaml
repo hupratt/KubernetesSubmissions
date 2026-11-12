@@ -13,7 +13,4 @@ resources:
 - gateway.yaml
 - analysis-template-restart-rate.yaml
 - analysis-template-cpu-usage.yaml
-images:
-- name: PROJECT/IMAGE
-  newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/todo-app
-  newTag: main-8c0dab82fed0052cf509c87a446c3dc4a374f67d
+
