@@ -67,15 +67,7 @@ jobs:
           set_image() {
             dir="$1"; image="$2"
             cd "$dir"
-            # name the base leaves in the rendered output: full path if the base
-            # rewrites it, otherwise the raw placeholder
-            if kustomize build . | grep -q "image: $PREFIX/$image"; then
-              NAME="$PREFIX/$image"
-            else
-              NAME="PROJECT/IMAGE"
-            fi
-            echo "Matching image name: $NAME"
-            kustomize edit set image "$NAME=$PREFIX/$image:$TAG"
+            kustomize edit set image "PROJECT/IMAGE=$PREFIX/$image:$TAG"
             kustomize build . | grep -q "image: $PREFIX/$image:$TAG" \
               || { echo "Tag not found in rendered output"; kustomize build . | grep -n "image:"; exit 1; }
             cd - >/dev/null

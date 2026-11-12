@@ -6,4 +6,3 @@ namespace: prod
 resources:
 - ./../../base
 
-namePrefix: prod-
