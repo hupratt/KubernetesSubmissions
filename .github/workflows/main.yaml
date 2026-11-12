@@ -64,11 +64,16 @@ jobs:
         run: |
           PREFIX="$REGISTRY/$PROJECT_ID/$REPOSITORY"
 
+          # left side = image string exactly as written in the rollout manifest
           (cd the_project/overlays/$OVERLAY && \
-            kustomize edit set image todo-app="$PREFIX/todo-app:$TAG")
+            kustomize edit set image PROJECT/IMAGE="$PREFIX/todo-app:$TAG")
 
           (cd log_output/overlays/$OVERLAY && \
-            kustomize edit set image log_output="$PREFIX/log_output:$TAG")
+            kustomize edit set image PROJECT/IMAGE="$PREFIX/log_output:$TAG")
+
+          # fail loudly if the tag didn't land in the rendered output
+          kustomize build the_project/overlays/$OVERLAY | grep -q "todo-app:$TAG"
+          kustomize build log_output/overlays/$OVERLAY  | grep -q "log_output:$TAG"
 
       - name: Commit and push
         run: |
@@ -76,6 +81,7 @@ jobs:
           git config user.email "github-actions@users.noreply.github.com"
           git add the_project/overlays/$OVERLAY/kustomization.yaml \
                   log_output/overlays/$OVERLAY/kustomization.yaml
+          git diff --cached --quiet && { echo "No changes"; exit 0; }
           git commit -m "Update $OVERLAY images to $TAG [skip ci]"
           for i in 1 2 3; do
             git pull --rebase origin main && git push origin HEAD:main && break
