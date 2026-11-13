@@ -9,4 +9,4 @@ resources:
 - httproute.yaml
 - secret.yaml
 - service.yaml
-
+- postgres.yaml
