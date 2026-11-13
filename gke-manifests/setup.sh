@@ -330,3 +330,7 @@ kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1
 
 kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.24.0/serving-hpa.yaml
 gh release create 5.6 --target=main --notes "5.6. The project is complete"
+
+gh release create 5.7 --target=main --notes "5.7. The project is complete"
+gh release create 5.8 --target=main --notes "5.8. The project is complete"
+

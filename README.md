@@ -1,13 +1,5 @@
 # KubernetesSubmissions
 
-#### Circle the logo of every product / project you've used
-
-
-1) grafana: i have installed grafana using the "kube-prometheus-stack" helm chart and configured the integrations with for example SNMP providers (synology), prometheus exporters and OTEL to collect metrics, logs and traces from a .NET application 
-2) authentik: i have implemented identity and access management with oidc and SSH single sign-on with authentik which allows me to schedule LDAP syncs and have Active Directory integration
-3) kyverno: i use kyverno as an admission controller — no privileged/root containers, required resource limits, no latest tags, blocked dangerous capabilities. Deployed via the official helm chart
-4) cloud native postgres: i have 2 CNPG clusters in my home-prod. One for immich and the another shared cluster for Authentik, NetBox, PostHog, Django apps, Grafana, Harbor, linkwarden, paperless-ngx and patchmon. Deployed via the official chart with the operator. I'm using the ghcr.io/cloudnative-pg/cloudnative-pg operator and the cloudnative-pg chart to deploy clusters that run postgis and cloudnative-vectorchord
-
 ## Exercises
 
 ### Chapter 2

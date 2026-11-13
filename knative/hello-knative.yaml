@@ -1,0 +1,25 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: hello
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        # Target concurrency (number of simultaneous requests per pod)
+        autoscaling.knative.dev/target: "10"
+        
+        # Minimum number of pods (set to "1" to eliminate cold starts)
+        autoscaling.knative.dev/min-scale: "1"
+        
+        # Maximum number of pods your app can scale up to
+        autoscaling.knative.dev/max-scale: "5"
+    spec:
+      containers:
+        - image: ghcr.io/knative/helloworld-go:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: TARGET
+              value: "Knative"
