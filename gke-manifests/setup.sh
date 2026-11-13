@@ -285,5 +285,21 @@ docker pull nareshgundavelli/simple-react:backend-1.1.2
 docker tag nareshgundavelli/simple-react:backend-1.1.2 europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/nareshgundavelli/simple-react:backend-1.1.2
 docker push europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/nareshgundavelli/simple-react:backend-1.1.2
 
+kubectl run psql-client --rm -it --namespace=staging --image=postgres:17 -- bash 
+psql -U postgres -h postgres-headless -d pingpong
+
+kubectl run psql-client --rm -it --namespace=prod --image=postgres:17 -- bash 
+psql -U postgres -h postgres-headless -d pingpong
+
+kubectl argo rollouts get rollout logoutput -n prod -w
+kubectl argo rollouts get rollout logoutput -n staging -w
+
+# deploy to prod
+
+git add -A
+git commit -m "deploy to prod, bump minor"
+git tag -a v1.6 -m "Release v1.6"
+git push origin main
+git push origin refs/tags/v1.6
 
 gh release create 5.3 --target=main --notes "5.3. The project is complete"
