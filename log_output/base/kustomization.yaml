@@ -3,10 +3,11 @@ kind: Kustomization
 resources:
 - analysis-template-cpu-usage.yaml
 - analysis-template-restart-rate.yaml
-- argo-rollout.yaml
+- rollout-v1.yaml
+- rollout-v2.yaml
 - configmap.yaml
 - gateway.yaml
 - httproute.yaml
 - secret.yaml
-- service.yaml
+- services.yaml
 - postgres.yaml

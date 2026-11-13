@@ -1,25 +1,23 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: logoutput-lb
+  name: logoutput-v1
 spec:
-  type: ClusterIP
   selector:
     app: logoutput
+    version: v1
   ports:
-    - protocol: TCP
-      port: 80
+    - port: 80
       targetPort: 8000
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: pingpong-lb
+  name: logoutput-v2
 spec:
-  type: ClusterIP
   selector:
     app: logoutput
+    version: v2
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8001
+    - port: 80
+      targetPort: 8000

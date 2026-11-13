@@ -11,7 +11,7 @@ spec:
             type: PathPrefix
             value: /pingpong
       filters:
-      # The Gateway receives /pingpong, rewrites it to /, and the app sees /
+        # The Gateway receives /pingpong, rewrites it to /, and the app sees /
         - type: URLRewrite
           urlRewrite:
             path:
@@ -27,28 +27,15 @@ spec:
       backendRefs:
         - name: pingpong-lb
           port: 80
+    # Canary split: v1 / v2
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: logoutput-lb
+        - name: logoutput-v1
           port: 80
----
-
-apiVersion: networking.gke.io/v1
-kind: HealthCheckPolicy
-metadata:
-  name: pingpong-hc
-spec:
-  default:
-    config:
-      type: HTTP
-      httpHealthCheck:
-        port: 8001
-        requestPath: /pings
-  targetRef:
-    group: ""
-    kind: Service
-    name: pingpong-lb
-
+          weight: 50
+        - name: logoutput-v2
+          port: 80
+          weight: 50

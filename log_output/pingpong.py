@@ -6,6 +6,7 @@ import psycopg
 from psycopg_pool import ConnectionPool
 
 PORT = int(os.environ.get("PORT", "8001"))
+VERSION = os.environ.get("VERSION", "unknown")
 
 # Either DATABASE_URL, or the standard PG* variables (PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE)
 DSN = os.environ.get("DATABASE_URL", "postgresql://pingpong:pingpong@localhost:5432/pingpong")
@@ -66,7 +67,9 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0].rstrip("/") or "/"
         try:
             if path == "/":
-                self.respond(f"pong {increment()}")
+                self.respond(
+                    f"pong {increment()}\ngreetings: Hello from version {VERSION}"
+                )
             elif path == "/pings":
                 self.respond(str(read_counter()))
             elif path == "/healthz":

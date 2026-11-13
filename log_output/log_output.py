@@ -8,6 +8,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 LOG_FILE = os.environ.get("LOG_FILE", "./info.log")
 MESSAGE = os.environ.get("MESSAGE", "empty message")
+VERSION = os.environ.get("VERSION", "unknown")
 INFO_FILE = os.environ.get("INFO_FILE", "information.txt")
 PINGPONG_URL = os.environ.get("PINGPONG_URL", "http://localhost:8001/pings")
 PORT = int(os.environ.get("PORT", "8000"))
@@ -19,13 +20,15 @@ def fetch_pongs():
             return r.read().decode().strip()
     except Exception:
         return "unavailable"
-    
+
+
 def pingpong_ok():
     try:
         with urllib.request.urlopen(PINGPONG_URL, timeout=2) as r:
             return r.status == 200
     except Exception:
         return False
+
 
 def read_file(path, default=""):
     try:
@@ -39,18 +42,23 @@ def produce():
     os.makedirs(os.path.dirname(LOG_FILE) or ".", exist_ok=True)
     tmp = LOG_FILE + ".tmp"
     env_message = f"env variable: MESSAGE={MESSAGE}"
+    greeting_message = f"greetings: Hello from version {VERSION}"
     while True:
         line = f"{datetime.now().isoformat(timespec='seconds')} {uuid.uuid4()}"
         file_message = f"file content: {read_file(INFO_FILE, 'missing')}"
         pong_message = f"Ping / Pongs: {fetch_pongs()}"
 
         with open(tmp, "w", encoding="utf-8") as f:
-            f.write(f"{line}\n{file_message}\n{env_message}\n{pong_message}\n")
+            f.write(
+                f"{line}\n{file_message}\n{env_message}\n"
+                f"{greeting_message}\n{pong_message}\n"
+            )
         os.replace(tmp, LOG_FILE)  # atomic swap, readers never see a partial write
 
         print(line, flush=True)
         print(file_message, flush=True)
         print(env_message, flush=True)
+        print(greeting_message, flush=True)
         print(pong_message, flush=True)
         time.sleep(5)
 

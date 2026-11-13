@@ -1,16 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: logoutput
+  name: logoutput-v1
 spec:
   replicas: 4
   selector:
     matchLabels:
       app: logoutput
+      version: v1
   strategy:
     canary:
       steps:
-        - setWeight: 50
         - analysis:
             templates:
               - templateName: cpu-usage
@@ -26,6 +26,7 @@ spec:
     metadata:
       labels:
         app: logoutput
+        version: v1
     spec:
       containers:
         - name: logoutput-expose
@@ -34,6 +35,8 @@ spec:
           ports:
             - containerPort: 8000
           env:
+            - name: VERSION
+              value: "1"
             - name: INFO_FILE
               value: "/config/information.txt"
             - name: MESSAGE
@@ -57,6 +60,8 @@ spec:
           image: PROJECT/IMAGE
           imagePullPolicy: Always
           env:
+            - name: VERSION
+              value: "v1"
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
