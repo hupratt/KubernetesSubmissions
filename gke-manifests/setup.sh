@@ -225,3 +225,49 @@ uv run fastapi run src/todo_app/main.py --host 0.0.0.0 --port 8000
 
 gh release create 4.9 --target=main --notes "4.9. The project is complete"
 gh release create 4.10 --target=main --notes "4.10. The project is complete"
+
+gh release create 5.1 --target=main --notes "5.1. The project is complete"
+
+curl -L https://istio.io/downloadIstio | sh -
+cd istio-1.32.0/bin
+./istioctl version
+./istioctl install --set profile=ambient --skip-confirmation
+kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+  kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.1/experimental-install.yaml
+
+k apply -f https://raw.githubusercontent.com/istio/istio/release-1.32/samples/bookinfo/platform/kube/bookinfo.yaml
+k apply -f https://raw.githubusercontent.com/istio/istio/release-1.32/samples/bookinfo/platform/kube/bookinfo-versions.yaml
+k apply -f https://raw.githubusercontent.com/istio/istio/release-1.32/samples/bookinfo/gateway-api/bookinfo-gateway.yaml
+
+kubectl label namespace default istio.io/dataplane-mode=ambient
+
+k apply -f kiali.yaml
+
+./istioctl dashboard kiali
+for i in $(seq 1 100); do curl -sSI -o /dev/null http://34.88.205.168/productpage; done
+
+k apply -f https://raw.githubusercontent.com/istio/istio/release-1.32/samples/curl/curl.yaml    
+kubectl exec deploy/curl -- curl -s "http://productpage:9080/productpage"
+
+kubectl apply -f - <<EOF
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: productpage-ztunnel
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: productpage
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/default/sa/bookinfo-gateway-istio
+EOF
+
+kubectl exec deploy/curl -- curl -s "http://productpage:9080/productpage"
+
+
+gh release create 5.2 --target=main --notes "5.2. The project is complete"
