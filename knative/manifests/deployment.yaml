@@ -6,6 +6,8 @@ spec:
   template:
     metadata:
       annotations:
+        # Target concurrency (number of simultaneous requests per pod)
+        autoscaling.knative.dev/target: "10"
         autoscaling.knative.dev/min-scale: "1"
         autoscaling.knative.dev/max-scale: "10"
     spec:
