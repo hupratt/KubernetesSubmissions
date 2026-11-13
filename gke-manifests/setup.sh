@@ -280,4 +280,10 @@ gcloud auth configure-docker europe-north1-docker.pkg.dev
 docker tag boxboat/hello-world-webapp:latest europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/hello-world-webapp:latest
 docker push europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/hello-world-webapp:latest
 
+
+docker pull nareshgundavelli/simple-react:backend-1.1.2
+docker tag nareshgundavelli/simple-react:backend-1.1.2 europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/nareshgundavelli/simple-react:backend-1.1.2
+docker push europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/nareshgundavelli/simple-react:backend-1.1.2
+
+
 gh release create 5.3 --target=main --notes "5.3. The project is complete"

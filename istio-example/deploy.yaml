@@ -10,17 +10,19 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-dep
+  name: hello-dep-v1
   namespace: istio-example
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: hello
+      version: v1
   template:
     metadata:
       labels:
         app: hello
+        version: v1
     spec:
       containers:
         - name: seedimage
@@ -35,13 +37,54 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hello-svc
+  name: hello-svc-v1
   namespace: istio-example
 spec:
   type: ClusterIP
   selector:
     app: hello
+    version: v1
   ports:
     - port: 80
       protocol: TCP
       targetPort: 8080
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-dep-v2
+  namespace: istio-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: hello
+        version: v2
+    spec:
+      containers:
+        - name: seedimage
+          image: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/nareshgundavelli/simple-react:backend-1.1.2
+
+--- 
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-svc-v2
+  namespace: istio-example
+spec:
+  type: ClusterIP
+  selector:
+    app: hello
+    version: v2
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 5000

@@ -29,5 +29,9 @@ spec:
         type: Exact
         value: /
     backendRefs:
-    - name: hello-svc
+    - name: hello-svc-v1
       port: 80
+      weight: 75
+    - name: hello-svc-v2
+      port: 80
+      weight: 25
