@@ -298,9 +298,9 @@ kubectl argo rollouts get rollout logoutput -n staging -w
 
 git add -A
 git commit -m "deploy to prod, bump minor"
-git tag -a v1.7 -m "Release v1.7"
+git tag -a v1.8 -m "working canary"
 git push origin main
-git push origin refs/tags/v1.7
+git push origin refs/tags/v1.8
 
 gcloud compute addresses list --global
 gcloud compute addresses delete gkegw1-6pb7-staging-pingpong-gateway-hdj7pia1fnm0 --global

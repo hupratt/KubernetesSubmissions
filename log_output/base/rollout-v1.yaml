@@ -61,7 +61,7 @@ spec:
           imagePullPolicy: Always
           env:
             - name: VERSION
-              value: "v1"
+              value: "1"
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
