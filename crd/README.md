@@ -1,6 +1,6 @@
 # build and push the controller image
-docker build -t hupratt/dummysite-controller:1.0 controller/
-docker push hupratt/dummysite-controller:1.0
+docker build -t europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/dummysite-controller:1.0 controller/
+docker push europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/dummysite-controller:1.0
 
 # CRD first, so the API knows the kind
 kubectl apply -f manifests/crd.yaml
@@ -15,5 +15,5 @@ kubectl apply -f manifests/dummysite.yaml
 # verify
 kubectl get ds
 kubectl get deploy,svc,pods
-kubectl port-forward svc/example-site 8080:80
-curl localhost:8080          # should show the "Example Domain" page
+kubectl port-forward svc/random-dummysite-site 9635:80 -c main
+curl localhost:9635

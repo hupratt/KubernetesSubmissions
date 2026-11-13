@@ -310,3 +310,8 @@ kubectl label namespace staging istio.io/dataplane-mode=ambient
 
 
 gh release create 5.3 --target=main --notes "5.3. The project is complete"
+
+docker build -t europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/dummysite-controller:1.0 controller/
+docker push europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/dummysite-controller:1.0
+
+gh release create 5.4 --target=main --notes "5.4. The project is complete"

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dummysite-controller
-  namespace: kube-system
+  namespace: crd
 spec:
   replicas: 1
   selector:
@@ -16,4 +16,4 @@ spec:
       serviceAccountName: dummysite-controller
       containers:
         - name: controller
-          image: hupratt/dummysite-controller:1.0
+          image: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/dummysite-controller:1.0
