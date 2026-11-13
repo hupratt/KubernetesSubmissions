@@ -305,4 +305,8 @@ git push origin refs/tags/v1.8
 gcloud compute addresses list --global
 gcloud compute addresses delete gkegw1-6pb7-staging-pingpong-gateway-hdj7pia1fnm0 --global
 
+kubectl label namespace prod istio.io/dataplane-mode=ambient
+kubectl label namespace staging istio.io/dataplane-mode=ambient
+
+
 gh release create 5.3 --target=main --notes "5.3. The project is complete"

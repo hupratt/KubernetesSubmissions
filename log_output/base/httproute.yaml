@@ -35,7 +35,7 @@ spec:
       backendRefs:
         - name: logoutput-v1
           port: 80
-          weight: 50
+          weight: 75
         - name: logoutput-v2
           port: 80
-          weight: 50
+          weight: 25
