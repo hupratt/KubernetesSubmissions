@@ -298,8 +298,8 @@ kubectl argo rollouts get rollout logoutput -n staging -w
 
 git add -A
 git commit -m "deploy to prod, bump minor"
-git tag -a v1.6 -m "Release v1.6"
+git tag -a v1.7 -m "Release v1.7"
 git push origin main
-git push origin refs/tags/v1.6
+git push origin refs/tags/v1.7
 
 gh release create 5.3 --target=main --notes "5.3. The project is complete"
