@@ -9,7 +9,7 @@ resources:
 images:
 - name: PROJECT/IMAGE
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/todo-app
-  newTag: main-2ec4c74224f7f57fdc014fb1bfca862988ce56ee
+  newTag: main-cace066b3ed43d258e3939bccb9fe8dcb1bec7d3
 
   # broadcaster: don't connect to NATS or Discord
 
