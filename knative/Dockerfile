@@ -1,0 +1,18 @@
+
+FROM python:3.13-slim
+
+# tells Python not to buffer stdout and stderr, so anything you print() is written out immediately
+ENV PYTHONUNBUFFERED=1
+ 
+WORKDIR /app
+COPY . .
+
+RUN pip install --no-cache-dir "psycopg[binary]" psycopg_pool
+
+RUN useradd --no-create-home --shell /usr/sbin/nologin appuser \
+ && chown appuser /app
+USER appuser
+EXPOSE 8000
+
+CMD ["python", "log_output.py"]
+ 

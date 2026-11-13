@@ -1,0 +1,40 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: logoutput
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+        autoscaling.knative.dev/max-scale: "10"
+    spec:
+      containers:
+        - image: hupratt/log_output:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: INFO_FILE
+              value: "/config/information.txt"
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: log-output-config
+                  key: MESSAGE
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: log-output-db
+                  key: DATABASE_URL
+          volumeMounts:
+            - name: information-volume
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: information-volume
+          configMap:
+            name: log-output-config
+            items:
+              - key: information.txt
+                path: information.txt
