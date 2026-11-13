@@ -1,0 +1,7 @@
+apiVersion: stable.dwk/v1
+kind: DummySite
+metadata:
+  name: example
+  namespace: kube-system
+spec:
+  website_url: "https://en.wikipedia.org/wiki/Kubernetes"
