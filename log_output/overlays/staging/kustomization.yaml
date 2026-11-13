@@ -12,4 +12,4 @@ patches:
 images:
 - name: PROJECT/IMAGE
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/log_output
-  newTag: main-af652906a28e8be59a0d7728abec84876f3cc237
+  newTag: main-ee04b0028d761707e044d91be4e76a898f33f70d
