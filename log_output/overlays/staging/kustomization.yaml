@@ -7,9 +7,9 @@ resources:
 - ./../../base
 
 patches:
-  - path: secrets-patch.yaml
+- path: secrets-patch.yaml
   
 images:
 - name: PROJECT/IMAGE
   newName: europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/log_output
-  newTag: main-cace066b3ed43d258e3939bccb9fe8dcb1bec7d3
+  newTag: main-ea20e1519f0526f3c9192ae5546bf24e147f17da
