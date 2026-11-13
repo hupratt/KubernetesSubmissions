@@ -1,17 +1,12 @@
 # KubernetesSubmissions
 
-#### Why I think orgs should go for rancher over openshift
+#### Circle the logo of every product / project you've used
 
 
-- **Lower licensing costs:** RKE2 is open source and free to use. OpenShift requires commercial subscriptions that can become expensive as compute capacity grows.
-- **Less vendor dependency:** RKE2 provides a Kubernetes environment with fewer Red Hat-specific abstractions, making future migrations easier.
-- **Architectural freedom:** Both platforms support alternative CNI, CSI storage, ingress, monitoring and GitOps solutions. RKE2 starts with fewer platform-specific assumptions.
-- **No unnecessary platform overhead:** OpenShift provides an extensive integrated developer platform. If the company primarily needs Kubernetes to run applications, much of that functionality may be unnecessary.
-- **Best-of-breed tooling:** RKE2 makes it straightforward to assemble an independently managed stack using Cilium, Ceph, Argo CD, Prometheus, Grafana and Kyverno.
-- **Multi-cluster management:** Rancher can centrally manage RKE2 and other Kubernetes distributions, avoiding dependency on a single Kubernetes ecosystem.
-- **Operational control:** RKE2 gives the infrastructure team greater responsibility over individual components, allowing upgrades and architectural decisions to be managed independently.
-- **Enterprise support remains available:** SUSE Rancher Prime provides commercial support without requiring an OpenShift subscription.
-
+1) grafana: i have installed grafana using the "kube-prometheus-stack" helm chart and configured the integrations with for example SNMP providers (synology), prometheus exporters and OTEL to collect metrics, logs and traces from a .NET application 
+2) authentik: i have implemented identity and access management with oidc and SSH single sign-on with authentik which allows me to schedule LDAP syncs and have Active Directory integration
+3) kyverno: i use kyverno as an admission controller — no privileged/root containers, required resource limits, no latest tags, blocked dangerous capabilities. Deployed via the official helm chart
+4) cloud native postgres: i have 2 CNPG clusters in my home-prod. One for immich and the another shared cluster for Authentik, NetBox, PostHog, Django apps, Grafana, Harbor, linkwarden, paperless-ngx and patchmon. Deployed via the official chart with the operator. I'm using the ghcr.io/cloudnative-pg/cloudnative-pg operator and the cloudnative-pg chart to deploy clusters that run postgis and cloudnative-vectorchord
 
 ## Exercises
 

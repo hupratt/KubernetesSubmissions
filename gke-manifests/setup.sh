@@ -317,3 +317,16 @@ docker push europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docke
 gh release create 5.4 --target=main --notes "5.4. The project is complete"
 
 gh release create 5.5 --target=main --notes "5.5. The project is complete"
+
+k3d cluster create --port 8082:30080@agent:0 -p 8081:80@loadbalancer --agents 2 --k3s-arg "--disable=traefik@server:0" --image rancher/k3s:v1.35.0-k3s1
+kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.24.0/serving-crds.yaml
+kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.24.0/serving-core.yaml
+kubectl apply -f https://github.com/knative-extensions/net-kourier/releases/download/knative-v1.24.0/kourier.yaml
+kubectl patch configmap/config-network \
+--namespace knative-serving \
+--type merge \
+--patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
+kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.24.0/serving-default-domain.yaml
+
+kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.24.0/serving-hpa.yaml
+gh release create 5.6 --target=main --notes "5.6. The project is complete"
