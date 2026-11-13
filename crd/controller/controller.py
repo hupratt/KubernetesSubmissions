@@ -29,8 +29,8 @@ while true; do
   delay=$(awk 'BEGIN{srand(); print int(300 + rand() * 601)}')
   echo "sleeping ${delay}s"
   sleep "$delay"
-  if curl -fsSL -A "$UA" "$RANDOM_URL" -o /html/random.html.tmp; then
-    mv /html/random.html.tmp /html/random.html
+  if curl -fsSL -A "$UA" "$RANDOM_URL" -o /html/index.html.tmp; then
+    mv /html/index.html.tmp /html/index.html
     echo "saved new random page"
   else
     echo "fetch failed, will retry next round"
@@ -64,7 +64,7 @@ def build_deployment(name, ns, url, ds):
         ports=[client.V1ContainerPort(container_port=80)],
         volume_mounts=[html_mount("/usr/share/nginx/html")],
     )
-    # sidecar: keeps writing a new random page to random.html
+    # sidecar: keeps writing a new random page to index.html
     sidecar = client.V1Container(
         name="random-page",
         image="curlimages/curl:8.10.1",
