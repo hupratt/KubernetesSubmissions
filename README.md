@@ -1,5 +1,18 @@
 # KubernetesSubmissions
 
+#### Why I think orgs should go for rancher over openshift
+
+
+- **Lower licensing costs:** RKE2 is open source and free to use. OpenShift requires commercial subscriptions that can become expensive as compute capacity grows.
+- **Less vendor dependency:** RKE2 provides a Kubernetes environment with fewer Red Hat-specific abstractions, making future migrations easier.
+- **Architectural freedom:** Both platforms support alternative CNI, CSI storage, ingress, monitoring and GitOps solutions. RKE2 starts with fewer platform-specific assumptions.
+- **No unnecessary platform overhead:** OpenShift provides an extensive integrated developer platform. If the company primarily needs Kubernetes to run applications, much of that functionality may be unnecessary.
+- **Best-of-breed tooling:** RKE2 makes it straightforward to assemble an independently managed stack using Cilium, Ceph, Argo CD, Prometheus, Grafana and Kyverno.
+- **Multi-cluster management:** Rancher can centrally manage RKE2 and other Kubernetes distributions, avoiding dependency on a single Kubernetes ecosystem.
+- **Operational control:** RKE2 gives the infrastructure team greater responsibility over individual components, allowing upgrades and architectural decisions to be managed independently.
+- **Enterprise support remains available:** SUSE Rancher Prime provides commercial support without requiring an OpenShift subscription.
+
+
 ## Exercises
 
 ### Chapter 2

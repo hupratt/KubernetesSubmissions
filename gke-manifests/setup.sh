@@ -315,3 +315,5 @@ docker build -t europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-d
 docker push europe-north1-docker.pkg.dev/project-f5db746b-2bc2-4fda-a87/my-docker-reg/dummysite-controller:1.0
 
 gh release create 5.4 --target=main --notes "5.4. The project is complete"
+
+gh release create 5.5 --target=main --notes "5.5. The project is complete"
